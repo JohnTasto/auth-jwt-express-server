@@ -1,0 +1,30 @@
+{
+  "name": "auth-jwt-express-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "NODE_ENV=test mocha --recursive -R min ./test",
+    "test:watch": "NODE_ENV=test nodemon --exec 'mocha --recursive -R min ./test'",
+    "start": "NODE_ENV=production node src/index.js",
+    "dev": "nodemon src/index.js"
+  },
+  "author": "John Tasto",
+  "license": "MIT",
+  "devDependencies": {
+    "mocha": "^3.2.0",
+    "nodemon": "^1.11.0"
+  },
+  "dependencies": {
+    "bcrypt-nodejs": "0.0.3",
+    "body-parser": "^1.16.1",
+    "cors": "^2.8.1",
+    "express": "^4.14.1",
+    "jwt-simple": "^0.5.1",
+    "mongoose": "^4.8.4",
+    "morgan": "^1.8.1",
+    "passport": "^0.3.2",
+    "passport-jwt": "^2.2.1",
+    "passport-local": "^1.0.0"
+  }
+}
