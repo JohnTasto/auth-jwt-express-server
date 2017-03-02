@@ -19,6 +19,7 @@ services:
       - src/index.js
     environment:
       - NODE_ENV=development
+      - MONGO_URI=mongodb://db:27017/auth
     volumes:
       - ./src:/code/src
     ports:
