@@ -9,7 +9,8 @@ const mongoose = require('mongoose')
 const cors = require('cors')
 
 // DB Setup
-mongoose.connect('mongodb://localhost:auth/auth')
+// mongoose.connect('mongodb://localhost:auth/auth')
+mongoose.connect('mongodb://db:27017/auth')
 
 // App Setup
 app.use(morgan('combined'))
@@ -18,7 +19,7 @@ app.use(bodyParser.json({ type: '*/*' }))
 router(app)
 
 // Server Setup
-const port = process.env.PORT || 3090
+const port = process.env.PORT || 9090
 const server = http.createServer(app)
 server.listen(port)
 console.log(`Listening on ${port}`)

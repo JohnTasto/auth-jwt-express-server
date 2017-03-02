@@ -1,0 +1,35 @@
+version: '2.1'
+
+
+services:
+
+  db:
+    image: mongo:3
+    volumes:
+      - ./mongo:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - backend
+
+  api:
+    build: .
+    entrypoint:
+      - ./node_modules/.bin/nodemon
+      - src/index.js
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./src:/code/src
+    ports:
+      - "9090:9090"
+    networks:
+      - backend
+    depends_on:
+      - db
+
+
+networks:
+
+  backend:
+    driver: bridge
