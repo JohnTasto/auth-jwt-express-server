@@ -7,7 +7,7 @@
     "clean": "rimraf dist",
     "prebuild": "npm run clean",
     "build": "babel src --ignore **/__tests__/*.js,**/*.spec.js,**/*.test.js --out-dir dist",
-    "test": "jest --coverage",
+    "test": "jest",
     "test:watch": "jest --watch",
     "prestart": "npm run build",
     "start": "NODE_ENV=production node dist/index.js",
@@ -41,17 +41,6 @@
     "passport-local": "^1.0.0"
   },
   "jest": {
-    "testEnvironment": "node",
-    "collectCoverageFrom": [
-      "src/*.js"
-    ],
-    "coverageThreshold": {
-      "global": {
-        "branches": 100,
-        "functions": 50,
-        "lines": 33,
-        "statements": 25
-      }
-    }
+    "testEnvironment": "node"
   }
 }
