@@ -1,0 +1,20 @@
+extends: standard
+plugins:
+  - standard
+  - promise
+rules:
+  comma-dangle:
+    - 1
+    - always-multiline
+  no-multi-spaces:
+    - 0
+  no-multiple-empty-lines:
+    - 1
+    - max: 2
+      maxBOF: 1
+      maxEOF: 1
+  space-before-function-paren:
+    - 1
+    - anonymous: always
+      named: never
+      asyncArrow: always

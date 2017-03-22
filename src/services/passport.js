@@ -7,16 +7,16 @@ const LocalStrategy = require('passport-local')
 
 // Create local strategy
 const localOptions = { usernameField: 'email' }
-const localLogin = new LocalStrategy(localOptions, function(email, password, done) {
+const localLogin = new LocalStrategy(localOptions, function (email, password, done) {
   // Verify this email and password, call done with the user
   // if it is the correct email and password
   // otherwise, call done with false
-  User.findOne({ email: email }, function(err, user) {
+  User.findOne({ email: email }, function (err, user) {
     if (err) { return done(err) }
     if (!user) { return done(null, false) }
 
     // compare passwords - is `password` equal to user.password?
-    user.comparePassword(password, function(err, isMatch) {
+    user.comparePassword(password, function (err, isMatch) {
       if (err) { return done(err) }
       if (!isMatch) { return done(null, false) }
 
@@ -29,15 +29,15 @@ const localLogin = new LocalStrategy(localOptions, function(email, password, don
 const jwtOptions = {
   jwtFromRequest: ExtractJwt.fromHeader('authorization'),
   secretOrKey: config.secret,
-  algorithms: ["HS256"],
+  algorithms: ['HS256'],
 }
 
 // Create JWT strategy
-const jwtAuth = new JwtStrategy(jwtOptions, function(payload, done) {
+const jwtAuth = new JwtStrategy(jwtOptions, function (payload, done) {
   // See if the user ID in the payload exists in our database
   // If it does, call 'done' with that user
   // otherwise, call done without a user object
-  User.findById(payload.sub, function(err, user) {
+  User.findById(payload.sub, function (err, user) {
     if (err) { return done(err, false) }
 
     if (user) {
