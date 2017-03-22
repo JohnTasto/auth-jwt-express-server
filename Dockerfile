@@ -4,4 +4,4 @@ ADD . /code/
 WORKDIR /code
 RUN npm install --quiet
 ENV NODE_ENV production
-ENTRYPOINT [ "node", "src/index.js" ]
+ENTRYPOINT [ "npm", "start" ]

@@ -15,8 +15,9 @@ services:
   api:
     build: .
     entrypoint:
-      - ./node_modules/.bin/nodemon
-      - src/index.js
+      - npm
+      - run
+      - dev
     environment:
       - NODE_ENV=development
       - MONGO_URI=mongodb://db:27017/auth
