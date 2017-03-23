@@ -41,6 +41,7 @@
     "passport-local": "^1.0.0"
   },
   "jest": {
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "setupTestFrameworkScriptFile": "<rootDir>/tools/setupTests.js"
   }
 }
