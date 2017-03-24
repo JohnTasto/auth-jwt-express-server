@@ -13,9 +13,9 @@ describe('Controller: authentication', () => {
     await User.remove({})
   })
 
-  describe('SignUp', () => {
+  describe('/signup', () => {
 
-    test('Post to /signup creates a new user', async () => {
+    test('Post with valid email & password creates a new user', async () => {
       const preCount = await User.count()
       const response = await request(app)
         .post('/signup')
@@ -28,7 +28,25 @@ describe('Controller: authentication', () => {
       expect(response.status).toBe(200)
       expect(postCount).toBe(preCount + 1)
     })
-
   })
 
+  describe('/signin', () => {
+
+    test('Post with valid email & password for existing user returns a token', async () => {
+      const user = new User({
+        email: 'test@test.com',
+        password: 'Password1',
+      })
+      await user.save()
+      const response = await request(app)
+        .post('/signin')
+        .send({
+          email: 'test@test.com',
+          password: 'Password1',
+        })
+
+      expect(response.status).toBe(200)
+      expect(response.body.token).toBeDefined()
+    })
+  })
 })
