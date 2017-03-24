@@ -4,8 +4,8 @@ const passport = require('passport')
 require('./services/passport')
 
 // don't create sessions since we're authenticating with JWTs every time
-const requireAuth = passport.authenticate('jwtAuth', { session: false })
-const requireSignin = passport.authenticate('local', { session: false })
+const requireSignin = passport.authenticate('local-signin', { session: false })
+const requireAuth = passport.authenticate('jwt-auth', { session: false })
 
 module.exports = function (app) {
   app.get('/feature', requireAuth, Feature.feature)
