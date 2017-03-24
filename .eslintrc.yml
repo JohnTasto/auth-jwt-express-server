@@ -16,6 +16,9 @@ rules:
       maxEOF: 1
   padded-blocks:
     - 0
+  semi:
+    - 1
+    - never
   space-before-function-paren:
     - 1
     - anonymous: always
