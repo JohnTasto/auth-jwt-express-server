@@ -26,7 +26,7 @@ describe('Controller: authentication', () => {
     test('Get with valid token returns a message', async () => {
       const response = await request(app)
         .get('/feature')
-        .set('authorization', token)
+        .set('authorization', `Bearer ${token}`)
 
       expect(response.status).toBe(200)
       expect(response.body.message).toBeDefined()
