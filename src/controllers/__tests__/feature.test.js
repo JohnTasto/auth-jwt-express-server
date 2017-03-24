@@ -3,7 +3,7 @@
 const request = require('supertest')
 const mongoose = require('mongoose')
 const app = require('../../app')
-const tokenForUser = require('../authentication').tokenForUser
+const createAuthToken = require('../../services/jwt').createAuthToken
 
 const User = mongoose.model('user')
 
@@ -14,7 +14,7 @@ describe('Controller: authentication', () => {
     email: 'test@test.com',
     password: 'Password1',
   })
-  const token = tokenForUser(user)
+  const token = createAuthToken(user)
 
   beforeAll(async () => {
     await User.remove({})
