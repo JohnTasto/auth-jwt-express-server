@@ -16,7 +16,7 @@ function tokenForUser(user) {
 
 // The router runs the Passport email/password authenticator as a gatekeeper to
 // this function. If the request makes it here, it is ok to send back a token.
-exports.signin = function  (req, res, next) {
+exports.signin = function (req, res, next) {
   res.send({ token: tokenForUser(req.user) })
 }
 
