@@ -6,12 +6,13 @@ const emailValidator = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i
 const passwordValidator = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/
 
 
-function tokenForUser(user) {
+const tokenForUser = user => {
   const timestamp = new Date().getTime()
 
   // sub = subject, iat = issued at time
   return jwt.encode({ sub: user.id, iat: timestamp }, config.secret)
 }
+exports.tokenForUser = tokenForUser
 
 
 // The router runs the Passport email/password authenticator as a gatekeeper to
