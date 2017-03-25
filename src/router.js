@@ -7,7 +7,7 @@ require('./services/passport')
 const requireSignin = passport.authenticate('local-signin', { session: false })
 const requireAuth = passport.authenticate('jwt-auth', { session: false })
 
-module.exports = function (app) {
+module.exports = app => {
   app.get('/feature', requireAuth, Feature.feature)
   app.post('/signin', requireSignin, Authentication.signin)
   app.post('/signup', Authentication.signup)

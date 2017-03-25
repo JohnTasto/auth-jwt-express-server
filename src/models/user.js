@@ -19,11 +19,9 @@ userSchema.pre('save', function (next) {
     .catch(err => next(err))
 })
 
-userSchema.methods.comparePassword = function (candidatePassword, callback) {
-  bcrypt.compare(candidatePassword, this.password)
-    .then(isMatch => callback(null, isMatch))
-    .catch(err => callback(err))
-}
+userSchema.method('comparePassword', function (candidatePassword) {
+  return bcrypt.compare(candidatePassword, this.password)
+})
 
 
 module.exports = mongoose.model('user', userSchema)

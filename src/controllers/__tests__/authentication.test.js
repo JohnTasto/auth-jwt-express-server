@@ -26,8 +26,8 @@ describe('Controller: authentication', () => {
         .send(user)
       const userCount = await User.count()
 
-      expect(response.status).toBe(200)
       expect(userCount).toBe(1)
+      expect(response.status).toBe(200)
     })
 
     test('Post with email already registered fails', async () => {
@@ -39,9 +39,10 @@ describe('Controller: authentication', () => {
         .send(user)
       const userCount = await User.count()
 
+      expect(userCount).toBe(1)
       expect(response1.status).toBe(200)
       expect(response2.status).toBe(422)
-      expect(userCount).toBe(1)
+      expect(typeof response2.body.error).toBe('string')
     })
   })
 
