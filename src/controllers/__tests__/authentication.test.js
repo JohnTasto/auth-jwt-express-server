@@ -9,43 +9,78 @@ const User = mongoose.model('user')
 
 describe('Controller: authentication', () => {
 
+  const user = {
+    email: 'test@test.com',
+    password: 'Password1',
+  }
+
   beforeEach(async () => {
     await User.remove({})
   })
 
   describe('/signup', () => {
 
-    test('Post with valid email & password creates a new user', async () => {
+    test('Post with fresh email & password creates a new user', async () => {
       const response = await request(app)
         .post('/signup')
-        .send({
-          email: 'test@test.com',
-          password: 'Password1',
-        })
+        .send(user)
       const userCount = await User.count()
 
       expect(response.status).toBe(200)
+      expect(userCount).toBe(1)
+    })
+
+    test('Post with email already registered fails', async () => {
+      const response1 = await request(app)
+        .post('/signup')
+        .send(user)
+      const response2 = await request(app)
+        .post('/signup')
+        .send(user)
+      const userCount = await User.count()
+
+      expect(response1.status).toBe(200)
+      expect(response2.status).toBe(422)
       expect(userCount).toBe(1)
     })
   })
 
   describe('/signin', () => {
 
-    test('Post with valid email & password for existing user returns a token', async () => {
-      const user = new User({
-        email: 'test@test.com',
-        password: 'Password1',
-      })
-      await user.save()
+    test('Post with registered email & password returns a token', async () => {
+      await User.create(user)
       const response = await request(app)
         .post('/signin')
-        .send({
-          email: 'test@test.com',
-          password: 'Password1',
-        })
+        .send(user)
 
       expect(response.status).toBe(200)
       expect(response.body.token).toBeDefined()
+    })
+
+    test('Post with registered email & bad password fails', async () => {
+      await User.create(user)
+      const response = await request(app)
+        .post('/signin')
+        .send({
+          email: user.email,
+          password: `!${user.password}`,
+        })
+
+      expect(response.status).toBe(401)
+      expect(response.body.token).not.toBeDefined()
+    })
+
+    test('Post with unregistered email fails', async () => {
+      await User.create(user)
+      const response = await request(app)
+        .post('/signin')
+        .send({
+          email: `a${user.email}`,
+          password: user.password,
+        })
+
+      expect(response.status).toBe(401)
+      expect(response.body.token).not.toBeDefined()
     })
   })
 })
