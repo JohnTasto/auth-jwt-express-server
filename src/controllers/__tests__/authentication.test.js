@@ -16,17 +16,16 @@ describe('Controller: authentication', () => {
   describe('/signup', () => {
 
     test('Post with valid email & password creates a new user', async () => {
-      const preCount = await User.count()
       const response = await request(app)
         .post('/signup')
         .send({
           email: 'test@test.com',
           password: 'Password1',
         })
-      const postCount = await User.count()
+      const userCount = await User.count()
 
       expect(response.status).toBe(200)
-      expect(postCount).toBe(preCount + 1)
+      expect(userCount).toBe(1)
     })
   })
 
