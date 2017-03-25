@@ -26,7 +26,7 @@ passport.use('local-signin', new LocalStrategy(localOptions, function (email, pa
 
 const jwtOptions = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderWithScheme('Bearer'),
-  secretOrKey: config.secret,
+  secretOrKey: config.jwtSecret,
   algorithms: ['HS256'],
 }
 
