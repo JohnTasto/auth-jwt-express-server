@@ -5,6 +5,8 @@ const router = require('./router')
 const mongoose = require('mongoose')
 const cors = require('cors')
 
+mongoose.Promise = Promise
+
 const app = express()
 
 if (process.env.NODE_ENV !== 'test') {
