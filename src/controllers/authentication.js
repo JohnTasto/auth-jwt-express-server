@@ -1,5 +1,5 @@
 const User = require('../models/user')
-const createAuthToken = require('../services/jwt').createAuthToken
+const jwt = require('../services/jwt')
 
 const emailValidator = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i
 const passwordValidator = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/
@@ -16,7 +16,10 @@ class ValidationError extends Error {
 // The router runs the Passport email/password authenticator as a gatekeeper to
 // this function. If the request makes it here, it is ok to send back a token.
 exports.signin = (req, res, next) => {
-  res.send({ token: createAuthToken(req.user) })
+  res.send({
+    refreshToken: jwt.createRefreshToken(req.user).token,
+    accessToken: jwt.createAccessToken(req.user).token,
+  })
 }
 
 
@@ -42,7 +45,10 @@ exports.signup = (req, res, next) => {
         password: password,
       })
     })
-    .then(user => res.json({ token: createAuthToken(user) }))
+    .then(user => res.json({
+      refreshToken: jwt.createRefreshToken(user).token,
+      accessToken: jwt.createAccessToken(user).token,
+    }))
     .catch(error => {
       if (error instanceof ValidationError) {
         res.status(422).send({ error: error.message })

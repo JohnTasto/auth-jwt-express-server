@@ -55,7 +55,8 @@ describe('Controller: authentication', () => {
         .send(user)
 
       expect(response.status).toBe(200)
-      expect(response.body.token).toBeDefined()
+      expect(response.body.refreshToken).toBeDefined()
+      expect(response.body.accessToken).toBeDefined()
     })
 
     test('Post with registered email & bad password fails', async () => {
@@ -68,7 +69,8 @@ describe('Controller: authentication', () => {
         })
 
       expect(response.status).toBe(401)
-      expect(response.body.token).not.toBeDefined()
+      expect(response.body.refreshToken).not.toBeDefined()
+      expect(response.body.accessToken).not.toBeDefined()
     })
 
     test('Post with unregistered email fails', async () => {
@@ -81,7 +83,8 @@ describe('Controller: authentication', () => {
         })
 
       expect(response.status).toBe(401)
-      expect(response.body.token).not.toBeDefined()
+      expect(response.body.refreshToken).not.toBeDefined()
+      expect(response.body.accessToken).not.toBeDefined()
     })
   })
 })

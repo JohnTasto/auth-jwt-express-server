@@ -9,7 +9,7 @@ const config = require('../config')
 
 const localOptions = { usernameField: 'email' }
 
-passport.use('local-signin', new LocalStrategy(localOptions, (email, password, done) => {
+passport.use('local signin', new LocalStrategy(localOptions, (email, password, done) => {
   User.findOne({ email: email }).exec()
     .then(user => {
       if (!user) return false
@@ -23,12 +23,27 @@ passport.use('local-signin', new LocalStrategy(localOptions, (email, password, d
 
 const jwtOptions = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderWithScheme('Bearer'),
-  secretOrKey: config.jwtSecret,
+  secretOrKey: config.jwt.secret,
   algorithms: ['HS256'],
+  ignoreExpiration: false,
 }
 
-passport.use('jwt-auth', new JwtStrategy(jwtOptions, (payload, done) => {
+
+passport.use('email verify token', new JwtStrategy(jwtOptions, (payload, done) => {
+  done(null, payload.aud === 'emailVerify' ? payload.sub : false)
+}))
+
+passport.use('refresh token', new JwtStrategy(jwtOptions, (payload, done) => {
+  if (payload.aud !== 'refresh') done(null, false)
   User.findById(payload.sub).exec()
     .then(user => user ? done(null, user) : done(null, false))
     .catch(error => done(error, false))
+}))
+
+passport.use('access token', new JwtStrategy(jwtOptions, (payload, done) => {
+  done(null, payload.aud === 'access' ? payload.sub : false)
+}))
+
+passport.use('password reset token', new JwtStrategy(jwtOptions, (payload, done) => {
+  done(null, payload.aud === 'passwordReset' ? payload.sub : false)
 }))
