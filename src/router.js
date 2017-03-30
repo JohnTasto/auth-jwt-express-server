@@ -1,4 +1,5 @@
-const Authentication = require('./controllers/authentication')
+const signup = require('./controllers/auth/signup')
+const signin = require('./controllers/auth/signin')
 const Feature = require('./controllers/feature')
 const passport = require('passport')
 require('./services/passport')
@@ -9,6 +10,6 @@ const requireAccessToken = passport.authenticate('access token', { session: fals
 
 module.exports = app => {
   app.get('/feature', requireAccessToken, Feature.feature)
-  app.post('/signin', requireLocalSignin, Authentication.signin)
-  app.post('/signup', Authentication.signup)
+  app.post('/signin', requireLocalSignin, signin)
+  app.post('/signup', signup)
 }
