@@ -26,24 +26,30 @@ const jwtOptions = {
   secretOrKey: config.jwt.secret,
   algorithms: ['HS256'],
   ignoreExpiration: false,
+  passReqToCallback: true,
 }
 
+const verify = (req, payload, done) => {
+  req.payload = payload
+  done(null, true)
+}
 
-passport.use('email verify token', new JwtStrategy(jwtOptions, (payload, done) => {
-  done(null, payload.aud === 'emailVerify' ? payload.sub : false)
-}))
+passport.use(
+  'email verify token',
+  new JwtStrategy({ ...jwtOptions, audience: 'emailVerify' }, verify),
+)
 
-passport.use('refresh token', new JwtStrategy(jwtOptions, (payload, done) => {
-  if (payload.aud !== 'refresh') done(null, false)
-  User.findById(payload.sub).exec()
-    .then(user => user ? done(null, user) : done(null, false))
-    .catch(error => done(error, false))
-}))
+passport.use(
+  'refresh token',
+  new JwtStrategy({ ...jwtOptions, audience: 'refresh' }, verify),
+)
 
-passport.use('access token', new JwtStrategy(jwtOptions, (payload, done) => {
-  done(null, payload.aud === 'access' ? payload.sub : false)
-}))
+passport.use(
+  'access token',
+  new JwtStrategy({ ...jwtOptions, audience: 'access' }, verify),
+)
 
-passport.use('password reset token', new JwtStrategy(jwtOptions, (payload, done) => {
-  done(null, payload.aud === 'passwordReset' ? payload.sub : false)
-}))
+passport.use(
+  'password reset token',
+  new JwtStrategy({ ...jwtOptions, audience: 'passwordReset' }, verify),
+)
