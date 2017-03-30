@@ -14,7 +14,7 @@ describe('Controller: authentication', () => {
     password: 'Password1',
   }
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     await User.remove({})
   })
 
@@ -30,6 +30,18 @@ describe('Controller: authentication', () => {
 
       expect(response.status).toBe(200)
       expect(response.body.message).toBeDefined()
+    })
+
+    test('Get with invalid token fails', async () => {
+      const { body: { refreshToken } } = await request(app)
+        .post('/signup')
+        .send(user)
+      const response = await request(app)
+        .get('/feature')
+        .set('authorization', `Bearer ${refreshToken}`)
+
+      expect(response.status).toBe(401)
+      expect(response.body.message).not.toBeDefined()
     })
   })
 
