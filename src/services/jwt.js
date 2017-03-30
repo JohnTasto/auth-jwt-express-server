@@ -1,6 +1,4 @@
 const jwt = require('jwt-simple')
-const moment = require('moment')
-const uuid = require('uuid').v4
 const config = require('../config')
 
 
@@ -12,23 +10,4 @@ const config = require('../config')
 // iat = issued at
 // jti = JWT ID
 
-
-const createTokenWithID = (user, type) => {
-  const exp = moment().add(...config.jwt[`${type}Expiry`]).valueOf()
-  const jti = uuid()
-  const token = jwt.encode({ sub: user.id, aud: type, exp, jti }, config.jwt.secret)
-  return { token, exp, jti }
-}
-
-
-exports.createEmailVerifyToken = user => createTokenWithID(user, 'emailVerify')
-
-exports.createRefreshToken = user => createTokenWithID(user, 'refresh')
-
-exports.createAccessToken = user => {
-  const exp = moment().add(...config.jwt.accessExpiry).valueOf()
-  const token = jwt.encode({ sub: user.id, aud: 'access', exp }, config.jwt.secret)
-  return { token }
-}
-
-exports.createPasswordResetToken = user => createTokenWithID(user, 'passwordReset')
+exports.createToken = payload => jwt.encode(payload, config.jwt.secret)

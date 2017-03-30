@@ -48,8 +48,13 @@ describe('Controller: authentication', () => {
 
   describe('/signin', () => {
 
+    beforeEach(async () => {
+      await request(app)
+        .post('/signup')
+        .send(user)
+    })
+
     test('Post with registered email & password returns a token', async () => {
-      await User.create(user)
       const response = await request(app)
         .post('/signin')
         .send(user)
@@ -60,7 +65,6 @@ describe('Controller: authentication', () => {
     })
 
     test('Post with registered email & bad password fails', async () => {
-      await User.create(user)
       const response = await request(app)
         .post('/signin')
         .send({
@@ -74,7 +78,6 @@ describe('Controller: authentication', () => {
     })
 
     test('Post with unregistered email fails', async () => {
-      await User.create(user)
       const response = await request(app)
         .post('/signin')
         .send({

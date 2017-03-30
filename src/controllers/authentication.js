@@ -1,3 +1,5 @@
+const moment = require('moment')
+const config = require('../config')
 const User = require('../models/user')
 const jwt = require('../services/jwt')
 
@@ -16,10 +18,22 @@ class ValidationError extends Error {
 // The router runs the Passport email/password authenticator as a gatekeeper to
 // this function. If the request makes it here, it is ok to send back a token.
 exports.signin = (req, res, next) => {
-  res.send({
-    refreshToken: jwt.createRefreshToken(req.user).token,
-    accessToken: jwt.createAccessToken(req.user).token,
-  })
+  req.user.refreshTokens.push({ exp: moment().add(...config.jwt.refreshExpiry).valueOf() })
+  req.user.save()
+    .then(user => res.json({
+      refreshToken: jwt.createToken({
+        aud: 'refresh',
+        sub: user.id,
+        exp: user.refreshTokens[0].exp,
+        jti: user.refreshTokens[0].id,
+      }),
+      accessToken: jwt.createToken({
+        aud: 'access',
+        sub: user.id,
+        exp: moment().add(...config.jwt.accessExpiry).valueOf(),
+      }),
+    }))
+    .catch(next)
 }
 
 
@@ -40,14 +54,25 @@ exports.signup = (req, res, next) => {
       if (existingUser)                      throw new ValidationError('Email is in use')
       if (!password)                         throw new ValidationError('No password provided')
       if (!passwordValidator.test(password)) throw new ValidationError('Insecure password')
-      return User.create({
+      const user = new User({
         email: email,
-        password: password,
+        refreshTokens: [{ exp: moment().add(...config.jwt.refreshExpiry).valueOf() }],
       })
+      return user.hashPassword(password)
     })
+    .then(user => user.save())
     .then(user => res.json({
-      refreshToken: jwt.createRefreshToken(user).token,
-      accessToken: jwt.createAccessToken(user).token,
+      refreshToken: jwt.createToken({
+        aud: 'refresh',
+        sub: user.id,
+        exp: user.refreshTokens[0].exp,
+        jti: user.refreshTokens[0].id,
+      }),
+      accessToken: jwt.createToken({
+        aud: 'access',
+        sub: user.id,
+        exp: moment().add(...config.jwt.accessExpiry).valueOf(),
+      }),
     }))
     .catch(error => {
       if (error instanceof ValidationError) {
