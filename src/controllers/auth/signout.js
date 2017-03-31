@@ -4,7 +4,6 @@ const User = require('../../models/user')
 
 module.exports = (req, res, next) => {
   const payload = req.payload
-  console.log(payload)
   User.findById(payload.sub)
     .then(user => {
       // might as well clear out any expired tokens since we're here....

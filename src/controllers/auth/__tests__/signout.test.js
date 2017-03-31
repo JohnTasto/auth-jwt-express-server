@@ -25,7 +25,9 @@ describe('Controller: auth /signout', () => {
     const response = await request(app)
       .post('/signout')
       .set('authorization', `Bearer ${refreshToken}`)
+    const signedoutUser = await User.findOne({ email: user.email })
 
+    expect(signedoutUser.refreshTokens).toHaveLength(0)
     expect(response.status).toBe(200)
   })
 
