@@ -21,7 +21,7 @@ describe('Controller: auth /signin', () => {
       .send(user)
   })
 
-  test('Post with registered email & password returns a token', async () => {
+  test('Post with registered email & password returns refresh and access tokens', async () => {
     const response = await request(app)
       .post('/signin')
       .send(user)
