@@ -23,7 +23,7 @@ describe('Controller: auth /signin', () => {
 
   test('Post with registered email & password returns refresh and access tokens', async () => {
     const response = await request(app)
-      .post('/signin')
+      .patch('/signin')
       .send(user)
 
     expect(response.status).toBe(200)
@@ -33,7 +33,7 @@ describe('Controller: auth /signin', () => {
 
   test('Post with registered email & bad password fails', async () => {
     const response = await request(app)
-      .post('/signin')
+      .patch('/signin')
       .send({
         email: user.email,
         password: `!${user.password}`,
@@ -46,7 +46,7 @@ describe('Controller: auth /signin', () => {
 
   test('Post with unregistered email fails', async () => {
     const response = await request(app)
-      .post('/signin')
+      .patch('/signin')
       .send({
         email: `a${user.email}`,
         password: user.password,

@@ -1,3 +1,5 @@
+/* eslint-disable func-call-spacing, space-in-parens, comma-spacing */
+
 const signup = require('./controllers/auth/signup')
 const signin = require('./controllers/auth/signin')
 const signout = require('./controllers/auth/signout')
@@ -12,9 +14,9 @@ const requireRefreshToken = passport.authenticate('refresh token', { session: fa
 const requireAccessToken = passport.authenticate('access token', { session: false })
 
 module.exports = app => {
-  app.post('/signup', signup)
-  app.post('/signin', requireLocalSignin, signin)
-  app.post('/signout', requireRefreshToken, signout)
-  app.post('/refresh', requireRefreshToken, refresh)
-  app.get('/feature', requireAccessToken, Feature.feature)
+  app.post  ('/signup'       ,                            signup)
+  app.patch ('/signin'       , requireLocalSignin,        signin)
+  app.patch ('/signout'      , requireRefreshToken,       signout)
+  app.get   ('/refresh'      , requireRefreshToken,       refresh)
+  app.get   ('/feature'      , requireAccessToken,        Feature.feature)
 }

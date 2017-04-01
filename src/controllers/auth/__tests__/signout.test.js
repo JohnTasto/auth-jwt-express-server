@@ -23,7 +23,7 @@ describe('Controller: auth /signout', () => {
       .post('/signup')
       .send(user)
     const response = await request(app)
-      .post('/signout')
+      .patch('/signout')
       .set('authorization', `Bearer ${refreshToken}`)
     const signedoutUser = await User.findOne({ email: user.email })
 
@@ -36,7 +36,7 @@ describe('Controller: auth /signout', () => {
       .post('/signup')
       .send(user)
     const response = await request(app)
-      .post('/signout')
+      .patch('/signout')
       .set('authorization', `Bearer ${accessToken}`)
 
     expect(response.status).toBe(401)

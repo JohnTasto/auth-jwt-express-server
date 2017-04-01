@@ -23,7 +23,7 @@ describe('Controller: auth /refresh', () => {
       .post('/signup')
       .send(user)
     const response = await request(app)
-      .post('/refresh')
+      .get('/refresh')
       .set('authorization', `Bearer ${refreshToken}`)
 
     expect(response.status).toBe(200)
@@ -35,7 +35,7 @@ describe('Controller: auth /refresh', () => {
       .post('/signup')
       .send(user)
     const response = await request(app)
-      .post('/refresh')
+      .get('/refresh')
       .set('authorization', `Bearer ${accessToken}`)
 
     expect(response.status).toBe(401)
