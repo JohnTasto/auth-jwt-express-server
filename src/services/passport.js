@@ -36,7 +36,7 @@ const verify = (req, payload, done) => {
 
 passport.use(
   'email verify token',
-  new JwtStrategy({ ...jwtOptions, audience: 'emailVerify' }, verify),
+  new JwtStrategy({ ...jwtOptions, audience: 'email verify' }, verify),
 )
 
 passport.use(
@@ -51,5 +51,5 @@ passport.use(
 
 passport.use(
   'password reset token',
-  new JwtStrategy({ ...jwtOptions, audience: 'passwordReset' }, verify),
+  new JwtStrategy({ ...jwtOptions, audience: 'password reset' }, verify),
 )

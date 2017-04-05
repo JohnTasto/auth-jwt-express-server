@@ -17,7 +17,7 @@ module.exports = (req, res, next) => {
           }),
         })
       } else {
-        res.status(422).send({ error: 'Invalid token' })
+        res.status(401).send({ error: 'Invalid token' })
       }
     })
     .catch(next)
