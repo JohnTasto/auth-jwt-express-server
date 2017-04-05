@@ -24,3 +24,9 @@ module.exports = app => {
   app.patch ('/resetpassword' , requirePasswordResetToken , passwordReset.setPassword)
   app.get   ('/feature'       , requireAccessToken        , Feature.feature)
 }
+
+// TODO: FIX SIGNIN TO SEND LAST REFRESH TOKEN - NOT FIRST!
+//       change signup to send email only and respond with 201 Created
+//       change signin to check if email is verified
+//       try using findOneAndUpdate with the $push update operator for refresh tokens
+//       try using findOneAndUpdate with the $set update operator for other tokens
