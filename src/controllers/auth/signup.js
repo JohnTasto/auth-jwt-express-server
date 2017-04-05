@@ -1,4 +1,3 @@
-const moment = require('moment')
 const config = require('../../config')
 const User = require('../../models/user')
 const jwt = require('../../services/jwt')
@@ -35,7 +34,7 @@ module.exports = (req, res, next) => {
       const user = new User({
         email,
         password,
-        refreshTokens: [{ exp: moment().add(...config.jwt.refreshExpiry).valueOf() }],
+        refreshTokens: [{ exp: jwt.expiry(config.jwt.refreshExpiry) }],
       })
       return user.save()
     })
@@ -49,7 +48,7 @@ module.exports = (req, res, next) => {
       accessToken: jwt.createToken({
         aud: 'access',
         sub: user.id,
-        exp: moment().add(...config.jwt.accessExpiry).valueOf(),
+        exp: jwt.expiry(config.jwt.accessExpiry),
       }),
     }))
     .catch(error => {

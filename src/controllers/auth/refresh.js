@@ -1,4 +1,3 @@
-const moment = require('moment')
 const config = require('../../config')
 const User = require('../../models/user')
 const jwt = require('../../services/jwt')
@@ -13,7 +12,7 @@ module.exports = (req, res, next) => {
           accessToken: jwt.createToken({
             aud: 'access',
             sub: user.id,
-            exp: moment().add(...config.jwt.accessExpiry).valueOf(),
+            exp: jwt.expiry(config.jwt.accessExpiry),
           }),
         })
       } else {

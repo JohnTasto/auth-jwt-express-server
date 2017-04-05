@@ -1,5 +1,6 @@
 const jwt = require('jwt-simple')
 const config = require('../config')
+const moment = require('moment')
 
 
 // iss = issuer
@@ -10,4 +11,6 @@ const config = require('../config')
 // iat = issued at
 // jti = JWT ID
 
-exports.createToken = payload => jwt.encode(payload, config.jwt.secret)
+module.exports.createToken = payload => jwt.encode(payload, config.jwt.secret)
+
+module.exports.expiry = expiry => moment().add(...expiry).valueOf()

@@ -1,4 +1,3 @@
-const moment = require('moment')
 const config = require('../../config')
 const User = require('../../models/user')
 const jwt = require('../../services/jwt')
@@ -7,7 +6,7 @@ const mail = require('../../services/mail')
 
 module.exports.sendToken = (req, res, next) => {
   const email = req.body.email
-  const exp = moment().add(...config.jwt.passwordResetExpiry).valueOf()
+  const exp = jwt.expiry(config.jwt.passwordResetExpiry)
   User.findOneAndUpdate(
     { email },
     { $set: { passwordResetToken: { exp } } },
