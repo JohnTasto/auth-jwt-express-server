@@ -33,12 +33,12 @@ module.exports = (req, res, next) => {
       if (!password)                         throw new ValidationError('No password provided')
       if (!passwordValidator.test(password)) throw new ValidationError('Insecure password')
       const user = new User({
-        email: email,
+        email,
+        password,
         refreshTokens: [{ exp: moment().add(...config.jwt.refreshExpiry).valueOf() }],
       })
-      return user.hashPassword(password)
+      return user.save()
     })
-    .then(user => user.save())
     .then(user => res.json({
       refreshToken: jwt.createToken({
         aud: 'refresh',

@@ -8,18 +8,27 @@ const rounds = process.env.NODE_ENV === 'test' ? 1 : 10
 
 const userSchema = new Schema({
   email: { type: String, required: true, unique: true, lowercase: true },
+  password: String,
   passwordHash: String,
   refreshTokens: [TokenSchema],
   emailVerifyToken: TokenSchema,
   passwordResetToken: TokenSchema,
 })
 
-userSchema.method('hashPassword', function (password) {
-  return bcrypt.hash(password, rounds)
-    .then(hash => {
-      this.passwordHash = hash
-      return this
-    })
+userSchema.pre('save', function (next) {
+  if (this.password) {
+    console.time('hash')
+    bcrypt.hash(this.password, rounds)
+      .then(hash => {
+        console.timeEnd('hash')
+        this.passwordHash = hash
+        this.password = undefined
+        next()
+      })
+      .catch(next)
+  } else {
+    next()
+  }
 })
 
 userSchema.method('comparePassword', function (candidatePassword) {

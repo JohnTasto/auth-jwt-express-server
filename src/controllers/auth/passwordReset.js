@@ -40,12 +40,12 @@ module.exports.setPassword = (req, res, next) => {
       if (user.passwordResetToken && String(user.passwordResetToken._id) === payload.jti) {
         user.passwordResetToken = undefined
         user.refreshTokens = []
-        return user.hashPassword(req.body.password)
+        user.password = req.body.password
+        return user.save()
       } else {
         throw new Error('Invalid token')
       }
     })
-    .then(user => user.save())
     .then(() => res.sendStatus(200))
     .catch(error => {
       console.log(error)
