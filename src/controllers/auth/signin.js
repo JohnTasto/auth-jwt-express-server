@@ -12,8 +12,8 @@ module.exports = (req, res, next) => {
       refreshToken: jwt.createToken({
         aud: 'refresh',
         sub: user.id,
-        exp: user.refreshTokens[0].exp,
-        jti: user.refreshTokens[0].id,
+        exp: user.refreshTokens[user.refreshTokens.length - 1].exp,
+        jti: user.refreshTokens[user.refreshTokens.length - 1].id,
       }),
       accessToken: jwt.createToken({
         aud: 'access',
