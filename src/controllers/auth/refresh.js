@@ -7,7 +7,7 @@ module.exports = (req, res, next) => {
   const payload = req.payload
   User.findById(payload.sub)
     .then(user => {
-      if (user.refreshTokens.some(rToken => String(rToken._id) === payload.jti)) {
+      if (user.refreshTokens.some(rToken => rToken.id === payload.jti)) {
         res.json({
           accessToken: jwt.createToken({
             aud: 'access',

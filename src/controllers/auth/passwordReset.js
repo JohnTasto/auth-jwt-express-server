@@ -36,7 +36,7 @@ module.exports.setPassword = (req, res, next) => {
   const payload = req.payload
   User.findById(payload.sub)
     .then(user => {
-      if (user.passwordResetToken && String(user.passwordResetToken._id) === payload.jti) {
+      if (user.passwordResetToken && user.passwordResetToken.id === payload.jti) {
         user.passwordResetToken = undefined
         user.refreshTokens = []
         user.password = req.body.password

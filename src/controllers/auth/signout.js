@@ -9,7 +9,7 @@ module.exports = (req, res, next) => {
       // might as well clear out any expired tokens since we're here....
       const now = moment().valueOf()
       user.refreshTokens.forEach(rToken => {
-        if (String(rToken._id) === payload.jti || now <= payload.exp) {
+        if (rToken.id === payload.jti || now <= payload.exp) {
           rToken.remove()
         }
       })
