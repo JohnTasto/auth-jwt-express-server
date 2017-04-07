@@ -9,15 +9,19 @@ module.exports = (req, res, next) => {
   const now = moment().valueOf()
   Promise.resolve()
     .then(() =>
-      User.findByIdAndUpdate(
-        payload.sub,
+      User.findOneAndUpdate(
+        {
+          _id: payload.sub,
+          refreshTokens: { $elemMatch: { jti: payload.jti } },
+          emailVerifyToken: { $exists: false },
+        },
         { $pull: { refreshTokens:
           { exp: { $lt: now } } },  // do a little maintenance
         },
       ).exec()
     )
     .then(user => {
-      if (user.refreshTokens.some(rToken => rToken.jti === payload.jti)) {
+      if (user) {
         res.json({
           accessToken: jwt.createToken({
             aud: 'access',
@@ -29,5 +33,8 @@ module.exports = (req, res, next) => {
         res.status(401).send({ error: 'Invalid token' })
       }
     })
-    .catch(next)
+    .catch(error => {
+      console.log(error)
+      next(error)
+    })
 }
