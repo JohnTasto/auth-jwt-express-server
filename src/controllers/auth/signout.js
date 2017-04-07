@@ -7,15 +7,27 @@ module.exports = (req, res, next) => {
   const now = moment().valueOf()
   Promise.resolve()
     .then(() =>
-      User.findByIdAndUpdate(
-        payload.sub,
+      User.findOneAndUpdate(
+        {
+          _id: payload.sub,
+          refreshTokens: { $elemMatch: { jti: payload.jti } },
+          emailVerifyToken: { $exists: false },
+        },
         { $pull: { refreshTokens: { $or: [
           { jti: payload.jti },
           { exp: { $lt: now } },  // do a little maintenance
         ] } } }
       ).exec()
     )
-    // no need to check if token was in db, user is trying to log out anyway...
-    .then(() => res.sendStatus(200))
-    .catch(next)
+    .then(user => {
+      if (user) {
+        res.sendStatus(200)
+      } else {
+        res.status(401).send({ error: 'Invalid token' })
+      }
+    })
+    .catch(error => {
+      console.log(error)
+      next(error)
+    })
 }
