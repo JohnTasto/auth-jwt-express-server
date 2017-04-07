@@ -44,15 +44,9 @@ module.exports = (req, res, next) => {
           }
         })
     })
-    .then(user => {
-      return {
-        refresh: { sub: user.id, ...tokenPayloads.refresh },
-        access: { sub: user.id, ...tokenPayloads.access },
-      }
-    })
-    .then(tokenPayloads => res.json({
-      refreshToken: jwt.createToken(tokenPayloads.refresh),
-      accessToken: jwt.createToken(tokenPayloads.access),
+    .then(user => res.json({
+      refreshToken: jwt.createToken({ sub: user.id, ...tokenPayloads.refresh }),
+      accessToken: jwt.createToken({ sub: user.id, ...tokenPayloads.access }),
     }))
     .catch(error => {
       if (error instanceof ValidationError) {
