@@ -1,59 +1,49 @@
+const uuid = require('uuid')
 const config = require('../../config')
 const User = require('../../models/user')
 const jwt = require('../../services/jwt')
+// const ValidationError = require('../../services/error').ValidationError
 
 const emailValidator = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i
 const passwordValidator = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/
-
-
-class ValidationError extends Error {
-  constructor(message) {
-    super(message)
-    this.name = 'ValidationError'
-  }
-}
 
 
 module.exports = (req, res, next) => {
   const email = req.body.email
   const password = req.body.password
 
-  Promise.resolve()
-    .then(() => {
-      if (!email)                            throw new ValidationError('No email provided')
-      if (!emailValidator.test(email))       throw new ValidationError('Malformed email')
-      return User.findOne({ email: email }).exec()
-    })
-    .then(existingUser => {
-      // Password errors could be checked earlier, but I feel it makes for a
-      // better user experience if email errors show up first. Also, the front
-      // end should be doing validation already so these shouldn't be hit.
-      if (existingUser)                      throw new ValidationError('Email is in use')
-      if (!password)                         throw new ValidationError('No password provided')
-      if (!passwordValidator.test(password)) throw new ValidationError('Insecure password')
-      const user = new User({
+  if (!email)                            return res.status(422).send({ error: 'No email provided' })
+  if (!emailValidator.test(email))       return res.status(422).send({ error: 'Malformed email' })
+  if (!password)                         return res.status(422).send({ error: 'No password provided' })
+  if (!passwordValidator.test(password)) return res.status(422).send({ error: 'Insecure password' })
+
+  const tokenPayloads = {
+    refresh: {
+      aud: 'refresh',
+      exp: jwt.expiry(config.jwt.refreshExpiry),
+      jti: uuid.v4(),
+    },
+    access: {
+      aud: 'access',
+      exp: jwt.expiry(config.jwt.accessExpiry),
+    },
+  }
+
+  User.hashPassword(req.body.password)
+    .then(hashedPassword => {
+      return User.create({
         email,
-        password,
-        refreshTokens: [{ exp: jwt.expiry(config.jwt.refreshExpiry) }],
+        password: hashedPassword,
+        refreshTokens: [{ exp: tokenPayloads.refresh.exp, jti: tokenPayloads.refresh.jti }],
       })
-      return user.save()
     })
     .then(user => res.json({
-      refreshToken: jwt.createToken({
-        aud: 'refresh',
-        sub: user.id,
-        exp: user.refreshTokens[0].exp,
-        jti: user.refreshTokens[0].id,
-      }),
-      accessToken: jwt.createToken({
-        aud: 'access',
-        sub: user.id,
-        exp: jwt.expiry(config.jwt.accessExpiry),
-      }),
+      refreshToken: jwt.createToken({ sub: user.id, ...tokenPayloads.refresh }),
+      accessToken: jwt.createToken({ sub: user.id, ...tokenPayloads.access }),
     }))
     .catch(error => {
-      if (error instanceof ValidationError) {
-        res.status(422).send({ error: error.message })
+      if (error.code === 11000) {
+        res.status(422).send({ error: 'Email already in use' })
       } else {
         next(error)
       }

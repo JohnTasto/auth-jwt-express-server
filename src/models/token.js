@@ -3,7 +3,8 @@ const Schema = mongoose.Schema
 
 
 const tokenSchema = new Schema({
-  exp: { type: Number, index: true },
+  exp: Number,
+  jti: String,
 })
 
 module.exports = tokenSchema

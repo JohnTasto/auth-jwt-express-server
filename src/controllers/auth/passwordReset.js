@@ -1,3 +1,4 @@
+const uuid = require('uuid')
 const config = require('../../config')
 const User = require('../../models/user')
 const jwt = require('../../services/jwt')
@@ -6,24 +7,31 @@ const mail = require('../../services/mail')
 
 module.exports.sendToken = (req, res, next) => {
   const email = req.body.email
-  const exp = jwt.expiry(config.jwt.passwordResetExpiry)
-  User.findOneAndUpdate(
-    { email },
-    { $set: { passwordResetToken: { exp } } },
-    { new: true },
-  ).exec()
+
+  const tokenPayload = {
+    aud: 'password reset',
+    exp: jwt.expiry(config.jwt.passwordResetExpiry),
+    jti: uuid.v4(),
+  }
+
+  Promise.resolve()
+    .then(() =>
+      User.findOneAndUpdate(
+        {
+          email,
+          emailVerifyToken: { $exists: false },
+        },
+        {
+          $set: { passwordResetToken: {
+            exp: tokenPayload.exp,
+            jti: tokenPayload.jti,
+          } },
+        },
+      ).exec()
+    )
     .then(user => {
-      if (!user.emailVerifyToken) {
-        const token = jwt.createToken({
-          aud: 'password reset',
-          sub: user.id,
-          exp: user.passwordResetToken.exp,
-          jti: user.passwordResetToken.id,
-        })
-        return mail.sendPasswordResetLink(email, token)
-      } else {
-        throw new Error('Email not validated')
-      }
+      const token = jwt.createToken({ sub: user.id, ...tokenPayload })
+      return mail.sendPasswordResetLink(email, token)
     })
     .then(() => res.sendStatus(200))
     .catch(error => {
@@ -32,20 +40,38 @@ module.exports.sendToken = (req, res, next) => {
     })
 }
 
+
 module.exports.setPassword = (req, res, next) => {
   const payload = req.payload
-  User.findById(payload.sub)
+  const password = req.body.password
+
+  User.hashPassword(password)
+    .then(hashedPassword =>
+      User.findOneAndUpdate(
+        {
+          _id: payload.sub,
+          'passwordResetToken.jti': payload.jti,
+          emailVerifyToken: { $exists: false },
+        },
+        {
+          $set: {
+            password: hashedPassword,
+            unhashedPassword: password,
+            resetTokens: [],
+          },
+          $unset: {
+            passwordResetToken: '',
+          },
+        }
+      ).exec()
+    )
     .then(user => {
-      if (user.passwordResetToken && user.passwordResetToken.id === payload.jti) {
-        user.passwordResetToken = undefined
-        user.refreshTokens = []
-        user.password = req.body.password
-        return user.save()
+      if (user) {
+        res.sendStatus(200)
       } else {
-        throw new Error('Invalid token')
+        res.status(401).send({ error: 'Invalid token' })
       }
     })
-    .then(() => res.sendStatus(200))
     .catch(error => {
       console.log(error)
       next(error)

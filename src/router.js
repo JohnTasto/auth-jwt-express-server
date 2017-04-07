@@ -10,14 +10,13 @@ const passport = require('passport')
 require('./services/passport')
 
 // don't create sessions since we're authenticating with JWTs every time
-const requireLocalSignin = passport.authenticate('local signin', { session: false })
 const requireRefreshToken = passport.authenticate('refresh token', { session: false })
 const requireAccessToken = passport.authenticate('access token', { session: false })
 const requirePasswordResetToken = passport.authenticate('password reset token', { session: false })
 
 module.exports = app => {
   app.post  ('/signup'        ,                             signup)
-  app.patch ('/signin'        , requireLocalSignin        , signin)
+  app.patch ('/signin'        ,                             signin)
   app.patch ('/signout'       , requireRefreshToken       , signout)
   app.get   ('/refresh'       , requireRefreshToken       , refresh)
   app.get   ('/resetpassword' ,                             passwordReset.sendToken)
