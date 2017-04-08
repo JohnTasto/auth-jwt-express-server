@@ -9,7 +9,7 @@ module.exports = (req, res, next) => {
   const email = req.body.email
   const password = req.body.password
 
-  const tokenPayloads = {
+  const tokenTemplates = {
     refresh: {
       aud: 'refresh',
       exp: jwt.expiry(config.jwt.refreshExpiry),
@@ -27,8 +27,8 @@ module.exports = (req, res, next) => {
       return User.findOneAndUpdate(
         { email: email },
         { $push: { refreshTokens: {
-          exp: tokenPayloads.refresh.exp,
-          jti: tokenPayloads.refresh.jti,
+          exp: tokenTemplates.refresh.exp,
+          jti: tokenTemplates.refresh.jti,
         } } },
       ).exec()
     })
@@ -45,8 +45,8 @@ module.exports = (req, res, next) => {
         })
     })
     .then(user => res.json({
-      refreshToken: jwt.createToken({ sub: user.id, ...tokenPayloads.refresh }),
-      accessToken: jwt.createToken({ sub: user.id, ...tokenPayloads.access }),
+      refreshToken: jwt.createToken({ sub: user.id, ...tokenTemplates.refresh }),
+      accessToken: jwt.createToken({ sub: user.id, ...tokenTemplates.access }),
     }))
     .catch(error => {
       if (error instanceof ValidationError) {

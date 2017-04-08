@@ -16,7 +16,7 @@ describe('Controller: feature', () => {
     password: 'Password1',
   }
 
-  const tokenPayload = {
+  const tokenTemplate = {
     aud: 'access',
     exp: jwt.expiry(config.jwt.accessExpiry),
   }
@@ -29,7 +29,7 @@ describe('Controller: feature', () => {
 
     test('Get with valid access token returns a message', async () => {
       const { id: sub } = await User.create(userTemplate)
-      const token = jwt.createToken({ sub, ...tokenPayload })
+      const token = jwt.createToken({ sub, ...tokenTemplate })
 
       const response = await request(app)
         .get('/feature')
@@ -42,7 +42,7 @@ describe('Controller: feature', () => {
     test('Get with expired access token fails', async () => {
       const { id: sub } = await User.create(userTemplate)
       const exp = jwt.expiry([ -1, 'minutes' ])
-      const token = jwt.createToken({ sub, ...tokenPayload, exp })
+      const token = jwt.createToken({ sub, ...tokenTemplate, exp })
 
       const response = await request(app)
         .get('/feature')

@@ -17,7 +17,7 @@ describe('Controller: auth /refresh', () => {
     password: 'Password1',
   }
 
-  const tokenPayload = {
+  const tokenTemplate = {
     aud: 'refresh',
     exp: jwt.expiry(config.jwt.refreshExpiry),
     jti: uuid.v4(),
@@ -30,9 +30,9 @@ describe('Controller: auth /refresh', () => {
   test('Post with valid refresh token returns access token', async () => {
     const { id: sub } = await User.create({
       ...userTemplate,
-      refreshTokens: [{ exp: tokenPayload.exp, jti: tokenPayload.jti }],
+      refreshTokens: [{ exp: tokenTemplate.exp, jti: tokenTemplate.jti }],
     })
-    const token = jwt.createToken({ sub, ...tokenPayload })
+    const token = jwt.createToken({ sub, ...tokenTemplate })
 
     const response = await request(app)
       .get('/refresh')
@@ -46,12 +46,12 @@ describe('Controller: auth /refresh', () => {
     const { id: sub } = await User.create({
       ...userTemplate,
       refreshTokens: [
-        { exp: tokenPayload.exp, jti: tokenPayload.jti },
+        { exp: tokenTemplate.exp, jti: tokenTemplate.jti },
         { exp: jwt.expiry([ -1, 'days' ]), jti: uuid.v4() },
         { exp: jwt.expiry([  8, 'days' ]), jti: uuid.v4() },  // eslint-disable-line standard/array-bracket-even-spacing
       ],
     })
-    const token = jwt.createToken({ sub, ...tokenPayload })
+    const token = jwt.createToken({ sub, ...tokenTemplate })
 
     const response = await request(app)
       .get('/refresh')
@@ -65,9 +65,9 @@ describe('Controller: auth /refresh', () => {
   test('Post with wrong jti in refresh token fails', async () => {
     const { id: sub } = await User.create({
       ...userTemplate,
-      refreshTokens: [{ exp: tokenPayload.exp, jti: uuid.v4() }],
+      refreshTokens: [{ exp: tokenTemplate.exp, jti: uuid.v4() }],
     })
-    const token = jwt.createToken({ sub, ...tokenPayload })
+    const token = jwt.createToken({ sub, ...tokenTemplate })
 
     const response = await request(app)
       .get('/refresh')

@@ -45,7 +45,7 @@ describe('Controller: auth /resetpassword', () => {
 
   describe('Change password', () => {
 
-    const tokenPayload = {
+    const tokenTemplate = {
       aud: 'password reset',
       exp: jwt.expiry(config.jwt.passwordResetExpiry),
       jti: uuid.v4(),
@@ -55,9 +55,9 @@ describe('Controller: auth /resetpassword', () => {
       const newPassword = 'Password2'
       const { id: sub } = await User.create({
         ...userTemplate,
-        passwordResetToken: { exp: tokenPayload.exp, jti: tokenPayload.jti },
+        passwordResetToken: { exp: tokenTemplate.exp, jti: tokenTemplate.jti },
       })
-      const token = jwt.createToken({ sub, ...tokenPayload })
+      const token = jwt.createToken({ sub, ...tokenTemplate })
 
       const response = await request(app)
         .patch('/resetpassword')

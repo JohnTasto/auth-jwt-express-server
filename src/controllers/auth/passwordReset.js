@@ -8,7 +8,7 @@ const mail = require('../../services/mail')
 module.exports.sendToken = (req, res, next) => {
   const email = req.body.email
 
-  const tokenPayload = {
+  const tokenTemplate = {
     aud: 'password reset',
     exp: jwt.expiry(config.jwt.passwordResetExpiry),
     jti: uuid.v4(),
@@ -23,14 +23,14 @@ module.exports.sendToken = (req, res, next) => {
         },
         {
           $set: { passwordResetToken: {
-            exp: tokenPayload.exp,
-            jti: tokenPayload.jti,
+            exp: tokenTemplate.exp,
+            jti: tokenTemplate.jti,
           } },
         },
       ).exec()
     )
     .then(user => {
-      const token = jwt.createToken({ sub: user.id, ...tokenPayload })
+      const token = jwt.createToken({ sub: user.id, ...tokenTemplate })
       return mail.sendPasswordResetLink(email, token)
     })
     .then(() => res.sendStatus(200))

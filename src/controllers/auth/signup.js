@@ -17,7 +17,7 @@ module.exports = (req, res, next) => {
   if (!password)                         return res.status(422).send({ error: 'No password provided' })
   if (!passwordValidator.test(password)) return res.status(422).send({ error: 'Insecure password' })
 
-  const tokenPayloads = {
+  const tokenTemplates = {
     refresh: {
       aud: 'refresh',
       exp: jwt.expiry(config.jwt.refreshExpiry),
@@ -34,12 +34,12 @@ module.exports = (req, res, next) => {
       return User.create({
         email,
         password: hashedPassword,
-        refreshTokens: [{ exp: tokenPayloads.refresh.exp, jti: tokenPayloads.refresh.jti }],
+        refreshTokens: [{ exp: tokenTemplates.refresh.exp, jti: tokenTemplates.refresh.jti }],
       })
     })
     .then(user => res.json({
-      refreshToken: jwt.createToken({ sub: user.id, ...tokenPayloads.refresh }),
-      accessToken: jwt.createToken({ sub: user.id, ...tokenPayloads.access }),
+      refreshToken: jwt.createToken({ sub: user.id, ...tokenTemplates.refresh }),
+      accessToken: jwt.createToken({ sub: user.id, ...tokenTemplates.access }),
     }))
     .catch(error => {
       if (error.code === 11000) {
