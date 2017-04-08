@@ -9,7 +9,7 @@ const User = mongoose.model('user')
 
 describe('Controller: auth /signup', () => {
 
-  const user = {
+  const userTemplate = {
     email: 'test@test.com',
     password: 'Password1',
   }
@@ -21,7 +21,7 @@ describe('Controller: auth /signup', () => {
   test('Post with fresh email & password creates a new user', async () => {
     const response = await request(app)
       .post('/signup')
-      .send(user)
+      .send(userTemplate)
     const userCount = await User.count()
 
     expect(userCount).toBe(1)
@@ -29,17 +29,14 @@ describe('Controller: auth /signup', () => {
   })
 
   test('Post with email already registered fails', async () => {
-    const response1 = await request(app)
+    await User.create(userTemplate)
+    const response = await request(app)
       .post('/signup')
-      .send(user)
-    const response2 = await request(app)
-      .post('/signup')
-      .send(user)
+      .send(userTemplate)
     const userCount = await User.count()
 
     expect(userCount).toBe(1)
-    expect(response1.status).toBe(200)
-    expect(response2.status).toBe(422)
-    expect(typeof response2.body.error).toBe('string')
+    expect(response.status).toBe(422)
+    expect(typeof response.body.error).toBe('string')
   })
 })

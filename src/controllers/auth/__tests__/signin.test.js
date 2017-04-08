@@ -6,37 +6,39 @@ const app = require('../../../app')
 
 const User = mongoose.model('user')
 
+// TODO: make sure we can't sign in unless email is ACTUALLY verified
 
 describe('Controller: auth /signin', () => {
 
-  const user = {
+  const userTemplate = {
     email: 'test@test.com',
     password: 'Password1',
   }
 
   beforeEach(async () => {
     await User.remove({})
-    await request(app)
-      .post('/signup')
-      .send(user)
+    await User.create({
+      ...userTemplate,
+      password: await User.hashPassword(userTemplate.password),
+    })
   })
 
-  test('Post with registered email & password returns refresh and access tokens', async () => {
+  test('Post with verified email & password returns refresh and access tokens', async () => {
     const response = await request(app)
       .patch('/signin')
-      .send(user)
+      .send(userTemplate)
 
     expect(response.status).toBe(200)
     expect(response.body.refreshToken).toBeDefined()
     expect(response.body.accessToken).toBeDefined()
   })
 
-  test('Post with registered email & bad password fails', async () => {
+  test('Post with verified email & bad password fails', async () => {
     const response = await request(app)
       .patch('/signin')
       .send({
-        email: user.email,
-        password: `!${user.password}`,
+        ...userTemplate,
+        password: `!${userTemplate.password}`,
       })
 
     expect(response.status).toBe(401)
@@ -44,12 +46,12 @@ describe('Controller: auth /signin', () => {
     expect(response.body.accessToken).not.toBeDefined()
   })
 
-  test('Post with unregistered email fails', async () => {
+  test('Post with unverified email fails', async () => {
     const response = await request(app)
       .patch('/signin')
       .send({
-        email: `a${user.email}`,
-        password: user.password,
+        ...userTemplate,
+        email: `a${userTemplate.email}`,
       })
 
     expect(response.status).toBe(401)
