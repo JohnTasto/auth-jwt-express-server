@@ -42,6 +42,26 @@ describe('Controller: auth /signout', () => {
     expect(user.refreshTokens).toHaveLength(0)
   })
 
+  test('Post with valid refresh token removes expired tokens from DB', async () => {
+    const { id: sub } = await User.create({
+      ...userTemplate,
+      refreshTokens: [
+        { exp: tokenPayload.exp, jti: tokenPayload.jti },
+        { exp: jwt.expiry([ -1, 'days' ]), jti: uuid.v4() },
+        { exp: jwt.expiry([  8, 'days' ]), jti: uuid.v4() },  // eslint-disable-line standard/array-bracket-even-spacing
+      ],
+    })
+    const token = jwt.createToken({ sub, ...tokenPayload })
+
+    const response = await request(app)
+      .patch('/signout')
+      .set('authorization', `Bearer ${token}`)
+    const user = await User.findOne({ email: userTemplate.email })
+
+    expect(response.status).toBe(200)
+    expect(user.refreshTokens).toHaveLength(1)
+  })
+
   test('Post with wrong jti in refresh token fails', async () => {
     const { id: sub } = await User.create({
       ...userTemplate,
