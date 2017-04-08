@@ -4,7 +4,7 @@ const User = require('../../models/user')
 
 module.exports = (req, res, next) => {
   const payload = req.payload
-  const now = moment().valueOf()
+  const now = moment().unix()
   Promise.resolve()
     .then(() =>
       User.findOneAndUpdate(

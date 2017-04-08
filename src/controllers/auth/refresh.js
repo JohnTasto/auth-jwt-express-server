@@ -6,7 +6,7 @@ const jwt = require('../../services/jwt')
 
 module.exports = (req, res, next) => {
   const payload = req.payload
-  const now = moment().valueOf()
+  const now = moment().unix()
   Promise.resolve()
     .then(() =>
       User.findOneAndUpdate(

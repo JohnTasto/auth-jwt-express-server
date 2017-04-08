@@ -13,4 +13,4 @@ const moment = require('moment')
 
 module.exports.createToken = payload => jwt.encode(payload, config.jwt.secret)
 
-module.exports.expiry = expiry => moment().add(...expiry).valueOf()
+module.exports.expiry = expiry => moment().add(...expiry).unix()
