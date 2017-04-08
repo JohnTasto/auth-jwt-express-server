@@ -9,7 +9,6 @@ const rounds = process.env.NODE_ENV === 'test' ? 1 : 10
 const userSchema = new Schema({
   email: { type: String, required: true, unique: true, lowercase: true },
   password: String,
-  unhashedPassword: String,
   refreshTokens: [TokenSchema],
   emailVerifyToken: TokenSchema,
   passwordResetToken: TokenSchema,
