@@ -10,7 +10,7 @@ const userSchema = new Schema({
   email: { type: String, required: true, unique: true, lowercase: true },
   password: String,
   refreshTokens: [TokenSchema],
-  emailVerifyToken: TokenSchema,
+  verifyEmailToken: TokenSchema,
   resetPasswordToken: TokenSchema,
 })
 

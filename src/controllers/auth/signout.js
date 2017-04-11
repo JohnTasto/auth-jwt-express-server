@@ -11,7 +11,7 @@ module.exports = (req, res, next) => {
         {
           _id: payload.sub,
           refreshTokens: { $elemMatch: { jti: payload.jti } },
-          emailVerifyToken: { $exists: false },
+          verifyEmailToken: { $exists: false },
         },
         { $pull: { refreshTokens: { $or: [
           { jti: payload.jti },

@@ -18,8 +18,8 @@ const verify = (req, payload, done) => {
 }
 
 passport.use(
-  'email verify token',
-  new JwtStrategy({ ...jwtOptions, audience: 'email verify' }, verify),
+  'verify email token',
+  new JwtStrategy({ ...jwtOptions, audience: 'verify email' }, verify),
 )
 
 passport.use(

@@ -9,7 +9,7 @@ module.exports = {
     secret: process.env.JWT_SECRET || '123456', // put something long and random here
     refreshExpiry:       [7,  'days'],
     accessExpiry:        [15, 'minutes'],
-    emailVerifyExpiry:   [1,  'days'],
+    verifyEmailExpiry:   [1,  'days'],
     resetPasswordExpiry: [1,  'hours'],
   },
   mailgun: {

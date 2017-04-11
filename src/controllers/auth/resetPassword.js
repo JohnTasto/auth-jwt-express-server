@@ -19,7 +19,7 @@ module.exports.sendToken = (req, res, next) => {
       User.findOneAndUpdate(
         {
           email,
-          emailVerifyToken: { $exists: false },
+          verifyEmailToken: { $exists: false },
         },
         {
           $set: { resetPasswordToken: {
@@ -51,7 +51,7 @@ module.exports.setPassword = (req, res, next) => {
         {
           _id: payload.sub,
           'resetPasswordToken.jti': payload.jti,
-          emailVerifyToken: { $exists: false },
+          verifyEmailToken: { $exists: false },
         },
         {
           $set: {
