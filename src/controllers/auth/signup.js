@@ -2,11 +2,11 @@ const uuid = require('uuid')
 const config = require('../../config')
 const User = require('../../models/user')
 const jwt = require('../../services/jwt')
-// const ValidationError = require('../../services/error').ValidationError
 
 const emailValidator = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i
 const passwordValidator = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/
 
+// TODO: send email only and respond with 201 Created
 
 module.exports = (req, res, next) => {
   const email = req.body.email

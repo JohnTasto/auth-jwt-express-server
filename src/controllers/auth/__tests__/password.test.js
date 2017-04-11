@@ -27,6 +27,8 @@ describe('Controller: auth password', () => {
 
   describe('GET /resetpassword: send reset password email', () => {
 
+    // TODO: test failure cases
+
     beforeEach(() => {
       mail.sendResetPasswordLink = jest.fn(() => Promise.resolve())
     })
@@ -44,6 +46,8 @@ describe('Controller: auth password', () => {
 
 
   describe('PATCH /resetpassword: reset password', () => {
+
+    // TODO: test failure cases
 
     const tokenTemplate = {
       aud: 'reset password',

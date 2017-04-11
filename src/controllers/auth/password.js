@@ -45,6 +45,8 @@ module.exports.reset = (req, res, next) => {
   const payload = req.payload
   const password = req.body.password
 
+  // TODO: validate password
+
   User.hashPassword(password)
     .then(hashedPassword =>
       User.findOneAndUpdate(
