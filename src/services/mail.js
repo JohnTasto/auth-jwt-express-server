@@ -21,8 +21,8 @@ module.exports.sendEmailVerificationLink = (email, token) => {
   return sendMail(message)
 }
 
-module.exports.sendPasswordResetLink = (email, token) => {
-  const expiry = `${config.jwt.passwordResetExpiry[0]} ${config.jwt.passwordResetExpiry[1]}`
+module.exports.sendResetPasswordLink = (email, token) => {
+  const expiry = `${config.jwt.resetPasswordExpiry[0]} ${config.jwt.resetPasswordExpiry[1]}`
   const message = {
     from: `Auth JWT <machine@${config.hostname}>`,
     to: email,

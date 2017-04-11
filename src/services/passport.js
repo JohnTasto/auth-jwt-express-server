@@ -33,6 +33,6 @@ passport.use(
 )
 
 passport.use(
-  'password reset token',
-  new JwtStrategy({ ...jwtOptions, audience: 'password reset' }, verify),
+  'reset password token',
+  new JwtStrategy({ ...jwtOptions, audience: 'reset password' }, verify),
 )

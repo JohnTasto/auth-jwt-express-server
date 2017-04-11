@@ -9,8 +9,8 @@ module.exports.sendToken = (req, res, next) => {
   const email = req.body.email
 
   const tokenTemplate = {
-    aud: 'password reset',
-    exp: jwt.expiry(config.jwt.passwordResetExpiry),
+    aud: 'reset password',
+    exp: jwt.expiry(config.jwt.resetPasswordExpiry),
     jti: uuid.v4(),
   }
 
@@ -22,7 +22,7 @@ module.exports.sendToken = (req, res, next) => {
           emailVerifyToken: { $exists: false },
         },
         {
-          $set: { passwordResetToken: {
+          $set: { resetPasswordToken: {
             exp: tokenTemplate.exp,
             jti: tokenTemplate.jti,
           } },
@@ -31,7 +31,7 @@ module.exports.sendToken = (req, res, next) => {
     )
     .then(user => {
       const token = jwt.createToken({ sub: user.id, ...tokenTemplate })
-      return mail.sendPasswordResetLink(email, token)
+      return mail.sendResetPasswordLink(email, token)
     })
     .then(() => res.sendStatus(200))
     .catch(error => {
@@ -50,17 +50,16 @@ module.exports.setPassword = (req, res, next) => {
       User.findOneAndUpdate(
         {
           _id: payload.sub,
-          'passwordResetToken.jti': payload.jti,
+          'resetPasswordToken.jti': payload.jti,
           emailVerifyToken: { $exists: false },
         },
         {
           $set: {
             password: hashedPassword,
-            unhashedPassword: password,
             resetTokens: [],
           },
           $unset: {
-            passwordResetToken: '',
+            resetPasswordToken: '',
           },
         }
       ).exec()

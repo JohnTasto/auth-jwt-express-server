@@ -11,7 +11,7 @@ const userSchema = new Schema({
   password: String,
   refreshTokens: [TokenSchema],
   emailVerifyToken: TokenSchema,
-  passwordResetToken: TokenSchema,
+  resetPasswordToken: TokenSchema,
 })
 
 userSchema.static('hashPassword', function (password) {

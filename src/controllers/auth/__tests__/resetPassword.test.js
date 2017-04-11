@@ -25,10 +25,10 @@ describe('Controller: auth /resetpassword', () => {
   })
 
 
-  describe('Send password reset email', () => {
+  describe('Send reset password email', () => {
 
     beforeEach(() => {
-      mail.sendPasswordResetLink = jest.fn(() => Promise.resolve())
+      mail.sendResetPasswordLink = jest.fn(() => Promise.resolve())
     })
 
     test('Get with verified email & password sends email with token', async () => {
@@ -38,7 +38,7 @@ describe('Controller: auth /resetpassword', () => {
         .send({ email: userTemplate.email })
 
       expect(response.status).toBe(200)
-      expect(mail.sendPasswordResetLink.mock.calls.length).toBe(1)
+      expect(mail.sendResetPasswordLink.mock.calls.length).toBe(1)
     })
   })
 
@@ -46,16 +46,16 @@ describe('Controller: auth /resetpassword', () => {
   describe('Change password', () => {
 
     const tokenTemplate = {
-      aud: 'password reset',
-      exp: jwt.expiry(config.jwt.passwordResetExpiry),
+      aud: 'reset password',
+      exp: jwt.expiry(config.jwt.resetPasswordExpiry),
       jti: uuid.v4(),
     }
 
-    test('Patch with valid password reset token and password changes password', async () => {
+    test('Patch with valid reset password token and password changes password', async () => {
       const newPassword = 'Password2'
       const { id: sub } = await User.create({
         ...userTemplate,
-        passwordResetToken: { exp: tokenTemplate.exp, jti: tokenTemplate.jti },
+        resetPasswordToken: { exp: tokenTemplate.exp, jti: tokenTemplate.jti },
       })
       const token = jwt.createToken({ sub, ...tokenTemplate })
 

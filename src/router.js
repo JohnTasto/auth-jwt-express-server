@@ -4,7 +4,7 @@ const signup = require('./controllers/auth/signup')
 const signin = require('./controllers/auth/signin')
 const signout = require('./controllers/auth/signout')
 const refresh = require('./controllers/auth/refresh')
-const passwordReset = require('./controllers/auth/passwordReset')
+const resetPassword = require('./controllers/auth/resetPassword')
 const Feature = require('./controllers/feature')
 const passport = require('passport')
 require('./services/passport')
@@ -12,15 +12,15 @@ require('./services/passport')
 // don't create sessions since we're authenticating with JWTs every time
 const requireRefreshToken = passport.authenticate('refresh token', { session: false })
 const requireAccessToken = passport.authenticate('access token', { session: false })
-const requirePasswordResetToken = passport.authenticate('password reset token', { session: false })
+const requireResetPasswordToken = passport.authenticate('reset password token', { session: false })
 
 module.exports = app => {
   app.post  ('/signup'        ,                             signup)
   app.patch ('/signin'        ,                             signin)
   app.patch ('/signout'       , requireRefreshToken       , signout)
   app.get   ('/refresh'       , requireRefreshToken       , refresh)
-  app.get   ('/resetpassword' ,                             passwordReset.sendToken)
-  app.patch ('/resetpassword' , requirePasswordResetToken , passwordReset.setPassword)
+  app.get   ('/resetpassword' ,                             resetPassword.sendToken)
+  app.patch ('/resetpassword' , requireResetPasswordToken , resetPassword.setPassword)
   app.get   ('/feature'       , requireAccessToken        , Feature.feature)
 }
 

@@ -10,7 +10,7 @@ module.exports = {
     refreshExpiry:       [7,  'days'],
     accessExpiry:        [15, 'minutes'],
     emailVerifyExpiry:   [1,  'days'],
-    passwordResetExpiry: [1,  'hours'],
+    resetPasswordExpiry: [1,  'hours'],
   },
   mailgun: {
     apiKey: process.env.MAILGUN_API_KEY || 'key-123456',
