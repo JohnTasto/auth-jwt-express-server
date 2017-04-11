@@ -10,7 +10,7 @@ const app = require('../../../app')
 const User = mongoose.model('user')
 
 
-describe('Controller: auth /refresh', () => {
+describe('Controller: auth refresh: POST /refresh: get access token', () => {
 
   const userTemplate = {
     email: 'test@test.com',
@@ -27,7 +27,7 @@ describe('Controller: auth /refresh', () => {
     await User.remove({})
   })
 
-  test('Post with valid refresh token returns access token', async () => {
+  test('POST with valid refresh token returns access token', async () => {
     const { id: sub } = await User.create({
       ...userTemplate,
       refreshTokens: [{ exp: tokenTemplate.exp, jti: tokenTemplate.jti }],
@@ -42,7 +42,7 @@ describe('Controller: auth /refresh', () => {
     expect(response.body.accessToken).toBeDefined()
   })
 
-  test('Post with valid refresh token removes expired tokens from DB', async () => {
+  test('POST with valid refresh token removes expired tokens from DB', async () => {
     const { id: sub } = await User.create({
       ...userTemplate,
       refreshTokens: [
@@ -62,7 +62,7 @@ describe('Controller: auth /refresh', () => {
     expect(user.refreshTokens).toHaveLength(2)
   })
 
-  test('Post with wrong jti in refresh token fails', async () => {
+  test('POST with wrong jti in refresh token fails', async () => {
     const { id: sub } = await User.create({
       ...userTemplate,
       refreshTokens: [{ exp: tokenTemplate.exp, jti: uuid.v4() }],

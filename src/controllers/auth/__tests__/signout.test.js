@@ -10,7 +10,7 @@ const app = require('../../../app')
 const User = mongoose.model('user')
 
 
-describe('Controller: auth /signout', () => {
+describe('Controller: auth signout: PATCH /signout: sign out user', () => {
 
   const userTemplate = {
     email: 'test@test.com',
@@ -27,7 +27,7 @@ describe('Controller: auth /signout', () => {
     await User.remove({})
   })
 
-  test('Post with valid refresh token removes token from DB', async () => {
+  test('PATCH with valid refresh token removes token from DB', async () => {
     const { id: sub } = await User.create({
       ...userTemplate,
       refreshTokens: [{ exp: tokenTemplate.exp, jti: tokenTemplate.jti }],
@@ -43,7 +43,7 @@ describe('Controller: auth /signout', () => {
     expect(user.refreshTokens).toHaveLength(0)
   })
 
-  test('Post with valid refresh token removes expired tokens from DB', async () => {
+  test('PATCH with valid refresh token removes expired tokens from DB', async () => {
     const { id: sub } = await User.create({
       ...userTemplate,
       refreshTokens: [
@@ -63,7 +63,7 @@ describe('Controller: auth /signout', () => {
     expect(user.refreshTokens).toHaveLength(1)
   })
 
-  test('Post with wrong jti in refresh token fails', async () => {
+  test('PATCH with wrong jti in refresh token fails', async () => {
     const { id: sub } = await User.create({
       ...userTemplate,
       refreshTokens: [{ exp: tokenTemplate.exp, jti: uuid.v4() }],

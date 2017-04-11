@@ -25,9 +25,9 @@ describe('Controller: feature', () => {
     await User.remove({})
   })
 
-  describe('/feature', () => {
+  describe('GET /feature: access protected resources', () => {
 
-    test('Get with valid access token returns a message', async () => {
+    test('GET with valid access token returns a message', async () => {
       const { id: sub } = await User.create(userTemplate)
       const token = jwt.createToken({ sub, ...tokenTemplate })
 
@@ -39,7 +39,7 @@ describe('Controller: feature', () => {
       expect(response.body.message).toBeDefined()
     })
 
-    test('Get with expired access token fails', async () => {
+    test('GET with expired access token fails', async () => {
       const { id: sub } = await User.create(userTemplate)
       const exp = jwt.expiry([ -1, 'minutes' ])
       const token = jwt.createToken({ sub, ...tokenTemplate, exp })

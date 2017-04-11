@@ -13,7 +13,7 @@ const User = mongoose.model('user')
 // TODO: test that we can't reset password if email is not verified
 //       test that we can't reset password with a token where jti doesn't match
 
-describe('Controller: auth /resetpassword', () => {
+describe('Controller: auth password', () => {
 
   const userTemplate = {
     email: 'test@test.com',
@@ -25,7 +25,7 @@ describe('Controller: auth /resetpassword', () => {
   })
 
 
-  describe('Send reset password email', () => {
+  describe('GET /resetpassword: send reset password email', () => {
 
     beforeEach(() => {
       mail.sendResetPasswordLink = jest.fn(() => Promise.resolve())
@@ -43,7 +43,7 @@ describe('Controller: auth /resetpassword', () => {
   })
 
 
-  describe('Reset password', () => {
+  describe('PATCH /resetpassword: reset password', () => {
 
     const tokenTemplate = {
       aud: 'reset password',

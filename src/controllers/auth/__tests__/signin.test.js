@@ -8,7 +8,7 @@ const User = mongoose.model('user')
 
 // TODO: make sure we can't sign in unless email is ACTUALLY verified
 
-describe('Controller: auth /signin', () => {
+describe('Controller: auth signin: PATCH /signin: sign in user', () => {
 
   const userTemplate = {
     email: 'test@test.com',
@@ -23,7 +23,7 @@ describe('Controller: auth /signin', () => {
     })
   })
 
-  test('Post with verified email & password returns refresh and access tokens', async () => {
+  test('PATCH with verified email & password returns refresh and access tokens', async () => {
     const response = await request(app)
       .patch('/signin')
       .send(userTemplate)
@@ -33,7 +33,7 @@ describe('Controller: auth /signin', () => {
     expect(response.body.accessToken).toBeDefined()
   })
 
-  test('Post with verified email & bad password fails', async () => {
+  test('PATCH with verified email & bad password fails', async () => {
     const response = await request(app)
       .patch('/signin')
       .send({
@@ -46,7 +46,7 @@ describe('Controller: auth /signin', () => {
     expect(response.body.accessToken).not.toBeDefined()
   })
 
-  test('Post with unverified email fails', async () => {
+  test('PATCH with unverified email fails', async () => {
     const response = await request(app)
       .patch('/signin')
       .send({

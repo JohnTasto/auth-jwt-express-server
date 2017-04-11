@@ -7,7 +7,7 @@ const app = require('../../../app')
 const User = mongoose.model('user')
 
 
-describe('Controller: auth /signup', () => {
+describe('Controller: auth signup: POST /signup: create new user', () => {
 
   const userTemplate = {
     email: 'test@test.com',
@@ -18,7 +18,7 @@ describe('Controller: auth /signup', () => {
     await User.remove({})
   })
 
-  test('Post with fresh email & password creates a new user', async () => {
+  test('POST with fresh email & password creates a new user', async () => {
     const response = await request(app)
       .post('/signup')
       .send(userTemplate)
@@ -28,7 +28,7 @@ describe('Controller: auth /signup', () => {
     expect(response.status).toBe(200)
   })
 
-  test('Post with email already registered fails', async () => {
+  test('POST with email already registered fails', async () => {
     await User.create(userTemplate)
     const response = await request(app)
       .post('/signup')
