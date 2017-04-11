@@ -43,7 +43,7 @@ describe('Controller: auth /resetpassword', () => {
   })
 
 
-  describe('Change password', () => {
+  describe('Reset password', () => {
 
     const tokenTemplate = {
       aud: 'reset password',
@@ -51,7 +51,7 @@ describe('Controller: auth /resetpassword', () => {
       jti: uuid.v4(),
     }
 
-    test('Patch with valid reset password token and password changes password', async () => {
+    test('Patch with valid reset password token and password resets password', async () => {
       const newPassword = 'Password2'
       const { id: sub } = await User.create({
         ...userTemplate,

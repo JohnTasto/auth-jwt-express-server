@@ -5,7 +5,7 @@ const jwt = require('../../services/jwt')
 const mail = require('../../services/mail')
 
 
-module.exports.sendToken = (req, res, next) => {
+module.exports.sendResetToken = (req, res, next) => {
   const email = req.body.email
 
   const tokenTemplate = {
@@ -41,7 +41,7 @@ module.exports.sendToken = (req, res, next) => {
 }
 
 
-module.exports.setPassword = (req, res, next) => {
+module.exports.reset = (req, res, next) => {
   const payload = req.payload
   const password = req.body.password
 
