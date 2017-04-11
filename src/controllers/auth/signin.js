@@ -34,7 +34,7 @@ module.exports = (req, res, next) => {
     })
     .then(user => {
       if (!user) throw new AuthenticationError('User not found')
-      if (user.verifyEmailToken) throw new AuthenticationError('Email is not validated')
+      if (user.verifyEmailToken) throw new AuthenticationError('Email is not verified')
       return user.comparePassword(password)
         .then(isMatch => {
           if (isMatch) {
