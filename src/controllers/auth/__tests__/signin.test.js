@@ -23,17 +23,19 @@ describe('Controller: auth signin: PATCH /signin: sign in user', () => {
     })
   })
 
-  test('PATCH with verified email & password returns refresh and access tokens', async () => {
+  test('verified email & password: returns refresh and access tokens', async () => {
     const response = await request(app)
       .patch('/signin')
       .send(userTemplate)
+    const user = await User.findOne({ email: userTemplate.email })
 
     expect(response.status).toBe(200)
     expect(response.body.refreshToken).toBeDefined()
     expect(response.body.accessToken).toBeDefined()
+    expect(user.refreshTokens).toHaveLength(1)
   })
 
-  test('PATCH with verified email & bad password fails', async () => {
+  test('verified email & bad password: fails', async () => {
     const response = await request(app)
       .patch('/signin')
       .send({
@@ -46,7 +48,7 @@ describe('Controller: auth signin: PATCH /signin: sign in user', () => {
     expect(response.body.accessToken).not.toBeDefined()
   })
 
-  test('PATCH with unverified email fails', async () => {
+  test('unverified email: fails', async () => {
     const response = await request(app)
       .patch('/signin')
       .send({

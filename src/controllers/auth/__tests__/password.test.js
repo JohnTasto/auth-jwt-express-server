@@ -31,7 +31,7 @@ describe('Controller: auth password', () => {
       mail.sendResetPasswordLink = jest.fn(() => Promise.resolve())
     })
 
-    test('Get with verified email & password sends email with token', async () => {
+    test('verified email & password: sends email with token', async () => {
       await User.create(userTemplate)
       const response = await request(app)
         .get('/resetpassword')
@@ -51,7 +51,7 @@ describe('Controller: auth password', () => {
       jti: uuid.v4(),
     }
 
-    test('Patch with valid reset password token and password resets password', async () => {
+    test('valid reset password token and password: resets password and signs out user', async () => {
       const newPassword = 'Password2'
       const { id: sub } = await User.create({
         ...userTemplate,
@@ -69,6 +69,8 @@ describe('Controller: auth password', () => {
 
       expect(response.status).toBe(200)
       expect(isMatch).toBeTruthy()
+      expect(user.resetPasswordToken).not.toBeDefined()
+      expect(user.refreshTokens).toHaveLength(0)
     })
   })
 })

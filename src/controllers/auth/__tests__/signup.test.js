@@ -18,7 +18,7 @@ describe('Controller: auth signup: POST /signup: create new user', () => {
     await User.remove({})
   })
 
-  test('POST with fresh email & password creates a new user', async () => {
+  test('fresh email & password: creates a new user', async () => {
     const response = await request(app)
       .post('/signup')
       .send(userTemplate)
@@ -28,7 +28,7 @@ describe('Controller: auth signup: POST /signup: create new user', () => {
     expect(response.status).toBe(200)
   })
 
-  test('POST with email already registered fails', async () => {
+  test('email already registered: fails', async () => {
     await User.create(userTemplate)
     const response = await request(app)
       .post('/signup')

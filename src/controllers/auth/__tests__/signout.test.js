@@ -27,7 +27,7 @@ describe('Controller: auth signout: PATCH /signout: sign out user', () => {
     await User.remove({})
   })
 
-  test('PATCH with valid refresh token removes token from DB', async () => {
+  test('valid refresh token: removes token from DB', async () => {
     const { id: sub } = await User.create({
       ...userTemplate,
       refreshTokens: [{ exp: tokenTemplate.exp, jti: tokenTemplate.jti }],
@@ -43,7 +43,7 @@ describe('Controller: auth signout: PATCH /signout: sign out user', () => {
     expect(user.refreshTokens).toHaveLength(0)
   })
 
-  test('PATCH with valid refresh token removes expired tokens from DB', async () => {
+  test('valid refresh token: removes expired tokens from DB', async () => {
     const { id: sub } = await User.create({
       ...userTemplate,
       refreshTokens: [
@@ -63,7 +63,7 @@ describe('Controller: auth signout: PATCH /signout: sign out user', () => {
     expect(user.refreshTokens).toHaveLength(1)
   })
 
-  test('PATCH with wrong jti in refresh token fails', async () => {
+  test('wrong jti in refresh token: fails', async () => {
     const { id: sub } = await User.create({
       ...userTemplate,
       refreshTokens: [{ exp: tokenTemplate.exp, jti: uuid.v4() }],

@@ -27,7 +27,7 @@ describe('Controller: auth refresh: POST /refresh: get access token', () => {
     await User.remove({})
   })
 
-  test('POST with valid refresh token returns access token', async () => {
+  test('valid refresh token: returns access token', async () => {
     const { id: sub } = await User.create({
       ...userTemplate,
       refreshTokens: [{ exp: tokenTemplate.exp, jti: tokenTemplate.jti }],
@@ -42,7 +42,7 @@ describe('Controller: auth refresh: POST /refresh: get access token', () => {
     expect(response.body.accessToken).toBeDefined()
   })
 
-  test('POST with valid refresh token removes expired tokens from DB', async () => {
+  test('valid refresh token: removes expired tokens from DB', async () => {
     const { id: sub } = await User.create({
       ...userTemplate,
       refreshTokens: [
@@ -62,7 +62,7 @@ describe('Controller: auth refresh: POST /refresh: get access token', () => {
     expect(user.refreshTokens).toHaveLength(2)
   })
 
-  test('POST with wrong jti in refresh token fails', async () => {
+  test('wrong jti in refresh token: fails', async () => {
     const { id: sub } = await User.create({
       ...userTemplate,
       refreshTokens: [{ exp: tokenTemplate.exp, jti: uuid.v4() }],
