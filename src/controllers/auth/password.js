@@ -56,7 +56,7 @@ module.exports.reset = (req, res, next) => {
         {
           $set: {
             password: hashedPassword,
-            resetTokens: [],
+            refreshTokens: [],
           },
           $unset: {
             resetPasswordToken: '',
