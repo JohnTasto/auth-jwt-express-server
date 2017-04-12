@@ -78,4 +78,19 @@ describe('Controller: auth signout: PATCH /signout: sign out user', () => {
     expect(response.status).toBe(401)
     expect(user.refreshTokens).toHaveLength(1)
   })
+
+  test('unverified email: fails', async () => {
+    const { id: sub } = await User.create({
+      ...userTemplate,
+      refreshTokens: [{ exp: tokenTemplate.exp, jti: tokenTemplate.jti }],
+      verifyEmailToken: { exp: 42, jti: 42 },
+    })
+    const token = jwt.createToken({ sub, ...tokenTemplate })
+
+    const response = await request(app)
+      .patch('/signout')
+      .set('authorization', `Bearer ${token}`)
+
+    expect(response.status).toBe(401)
+  })
 })
