@@ -49,5 +49,24 @@ describe('Controller: auth verify', () => {
       expect(user.verifyEmailToken).not.toBeDefined()
       expect(user.refreshTokens).toHaveLength(1)
     })
+
+    test('wrong jti in verify email token: fails', async () => {
+      const { id: sub } = await User.create({
+        ...userTemplate,
+        verifyEmailToken: { exp: tokenTemplate.exp, jti: uuid.v4() },
+      })
+      const token = jwt.createToken({ sub, ...tokenTemplate })
+
+      const response = await request(app)
+        .patch('/verifyemail')
+        .set('authorization', `Bearer ${token}`)
+      const user = await User.findOne({ email: userTemplate.email })
+
+      expect(response.status).toBe(401)
+      expect(response.body.refreshToken).not.toBeDefined()
+      expect(response.body.accessToken).not.toBeDefined()
+      expect(user.verifyEmailToken).toBeDefined()
+      expect(user.refreshTokens).toHaveLength(0)
+    })
   })
 })

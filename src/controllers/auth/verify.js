@@ -20,7 +20,7 @@ module.exports.email = (req, res, next) => {
   }
 
   Promise.resolve()
-    .then(hashedPassword =>
+    .then(() =>
       User.findOneAndUpdate(
         {
           _id: payload.sub,
