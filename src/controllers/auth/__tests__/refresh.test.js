@@ -76,4 +76,20 @@ describe('Controller: auth refresh: POST /refresh: get access token', () => {
     expect(response.status).toBe(401)
     expect(response.body.accessToken).not.toBeDefined()
   })
+
+  test('unverified email: fails', async () => {
+    const { id: sub } = await User.create({
+      ...userTemplate,
+      refreshTokens: [{ exp: tokenTemplate.exp, jti: tokenTemplate.jti }],
+      verifyEmailToken: { exp: 42, jti: 42 },
+    })
+    const token = jwt.createToken({ sub, ...tokenTemplate })
+
+    const response = await request(app)
+      .get('/refresh')
+      .set('authorization', `Bearer ${token}`)
+
+    expect(response.status).toBe(401)
+    expect(response.body.accessToken).not.toBeDefined()
+  })
 })
