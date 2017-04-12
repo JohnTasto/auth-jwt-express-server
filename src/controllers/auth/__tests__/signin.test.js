@@ -36,17 +36,11 @@ describe('Controller: auth signin: PATCH /signin: sign in user', () => {
   })
 
   test('verified email & bad password: fails', async () => {
-    await User.create({
-      ...userTemplate,
-      password: await User.hashPassword(userTemplate.password),
-    })
+    await User.create(userTemplate)
 
     const response = await request(app)
       .patch('/signin')
-      .send({
-        ...userTemplate,
-        password: `!${userTemplate.password}`,
-      })
+      .send(userTemplate)
 
     expect(response.status).toBe(401)
     expect(response.body.refreshToken).not.toBeDefined()
@@ -54,17 +48,9 @@ describe('Controller: auth signin: PATCH /signin: sign in user', () => {
   })
 
   test('unregistered email: fails', async () => {
-    await User.create({
-      ...userTemplate,
-      password: await User.hashPassword(userTemplate.password),
-    })
-
     const response = await request(app)
       .patch('/signin')
-      .send({
-        ...userTemplate,
-        email: `a${userTemplate.email}`,
-      })
+      .send(userTemplate)
 
     expect(response.status).toBe(401)
     expect(response.body.refreshToken).not.toBeDefined()
