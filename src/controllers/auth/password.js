@@ -3,6 +3,7 @@ const config = require('../../config')
 const User = require('../../models/user')
 const jwt = require('../../services/jwt')
 const mail = require('../../services/mail')
+const AuthenticationError = require('../../services/error').AuthenticationError
 
 
 module.exports.sendResetToken = (req, res, next) => {
@@ -30,13 +31,19 @@ module.exports.sendResetToken = (req, res, next) => {
       ).exec()
     )
     .then(user => {
+      if (!user) throw new AuthenticationError('User not found')
+      if (user.verifyEmailToken) throw new AuthenticationError('Email is not verified')
       const token = jwt.createToken({ sub: user.id, ...tokenTemplate })
       return mail.sendResetPasswordLink(email, token)
     })
     .then(() => res.sendStatus(200))
     .catch(error => {
-      console.log(error)
-      next(error)
+      if (error instanceof AuthenticationError) {
+        res.status(401).send({ error: error.message })
+      } else {
+        console.log(error)
+        next(error)
+      }
     })
 }
 

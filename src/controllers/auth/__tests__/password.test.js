@@ -10,8 +10,6 @@ const mail = require('../../../services/mail')
 
 const User = mongoose.model('user')
 
-// TODO: test that we can't reset password if email is not verified
-//       test that we can't reset password with a token where jti doesn't match
 
 describe('Controller: auth password', () => {
 
@@ -27,13 +25,11 @@ describe('Controller: auth password', () => {
 
   describe('GET /resetpassword: send reset password email', () => {
 
-    // TODO: test failure cases
-
     beforeEach(() => {
       mail.sendResetPasswordLink = jest.fn(() => Promise.resolve())
     })
 
-    test('verified email & password: sends email with token', async () => {
+    test('verified email: sends email with token', async () => {
       await User.create(userTemplate)
       const response = await request(app)
         .get('/resetpassword')
@@ -41,6 +37,28 @@ describe('Controller: auth password', () => {
 
       expect(response.status).toBe(200)
       expect(mail.sendResetPasswordLink.mock.calls.length).toBe(1)
+    })
+
+    test('unregistered email: fails', async () => {
+      const response = await request(app)
+        .get('/resetpassword')
+        .send({ email: userTemplate.email })
+
+      expect(response.status).toBe(401)
+      expect(mail.sendResetPasswordLink.mock.calls.length).toBe(0)
+    })
+
+    test('unverified email: fails', async () => {
+      await User.create({
+        ...userTemplate,
+        verifyEmailToken: { exp: 42, jti: 42 },
+      })
+      const response = await request(app)
+        .get('/resetpassword')
+        .send({ email: userTemplate.email })
+
+      expect(response.status).toBe(401)
+      expect(mail.sendResetPasswordLink.mock.calls.length).toBe(0)
     })
   })
 
@@ -59,6 +77,7 @@ describe('Controller: auth password', () => {
       const newPassword = 'Password2'
       const { id: sub } = await User.create({
         ...userTemplate,
+        refreshTokens: [{ exp: 42, jti: 42 }],
         resetPasswordToken: { exp: tokenTemplate.exp, jti: tokenTemplate.jti },
       })
       const token = jwt.createToken({ sub, ...tokenTemplate })
@@ -75,6 +94,53 @@ describe('Controller: auth password', () => {
       expect(isMatch).toBeTruthy()
       expect(user.resetPasswordToken).not.toBeDefined()
       expect(user.refreshTokens).toHaveLength(0)
+    })
+
+    test('wrong jti in reset password token: fails', async () => {
+      const newPassword = 'Password2'
+      const { id: sub } = await User.create({
+        ...userTemplate,
+        refreshTokens: [{ exp: 42, jti: 42 }],
+        resetPasswordToken: { exp: tokenTemplate.exp, jti: uuid.v4() },
+      })
+      const token = jwt.createToken({ sub, ...tokenTemplate })
+
+      const response = await request(app)
+        .patch('/resetpassword')
+        .set('authorization', `Bearer ${token}`)
+        .send({ password: newPassword })
+
+      const user = await User.findOne({ email: userTemplate.email })
+      const isMatch = await user.comparePassword(newPassword)
+
+      expect(response.status).toBe(401)
+      expect(isMatch).toBeFalsy()
+      expect(user.resetPasswordToken).toBeDefined()
+      expect(user.refreshTokens).toHaveLength(1)
+    })
+
+    test('unverified email: fails', async () => {
+      const newPassword = 'Password2'
+      const { id: sub } = await User.create({
+        ...userTemplate,
+        refreshTokens: [{ exp: 42, jti: 42 }],
+        verifyEmailToken: { exp: 42, jti: 42 },
+        resetPasswordToken: { exp: tokenTemplate.exp, jti: tokenTemplate.jti },
+      })
+      const token = jwt.createToken({ sub, ...tokenTemplate })
+
+      const response = await request(app)
+        .patch('/resetpassword')
+        .set('authorization', `Bearer ${token}`)
+        .send({ password: newPassword })
+
+      const user = await User.findOne({ email: userTemplate.email })
+      const isMatch = await user.comparePassword(newPassword)
+
+      expect(response.status).toBe(401)
+      expect(isMatch).toBeFalsy()
+      expect(user.resetPasswordToken).toBeDefined()
+      expect(user.refreshTokens).toHaveLength(1)
     })
   })
 })
