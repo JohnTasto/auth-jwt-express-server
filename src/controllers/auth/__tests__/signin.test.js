@@ -6,7 +6,6 @@ const app = require('../../../app')
 
 const User = mongoose.model('user')
 
-// TODO: make sure we can't sign in unless email is ACTUALLY verified
 
 describe('Controller: auth signin: PATCH /signin: sign in user', () => {
 
@@ -17,13 +16,14 @@ describe('Controller: auth signin: PATCH /signin: sign in user', () => {
 
   beforeEach(async () => {
     await User.remove({})
+  })
+
+  test('verified email & password: returns refresh and access tokens', async () => {
     await User.create({
       ...userTemplate,
       password: await User.hashPassword(userTemplate.password),
     })
-  })
 
-  test('verified email & password: returns refresh and access tokens', async () => {
     const response = await request(app)
       .patch('/signin')
       .send(userTemplate)
@@ -36,6 +36,11 @@ describe('Controller: auth signin: PATCH /signin: sign in user', () => {
   })
 
   test('verified email & bad password: fails', async () => {
+    await User.create({
+      ...userTemplate,
+      password: await User.hashPassword(userTemplate.password),
+    })
+
     const response = await request(app)
       .patch('/signin')
       .send({
@@ -48,13 +53,34 @@ describe('Controller: auth signin: PATCH /signin: sign in user', () => {
     expect(response.body.accessToken).not.toBeDefined()
   })
 
-  test('unverified email: fails', async () => {
+  test('unregistered email: fails', async () => {
+    await User.create({
+      ...userTemplate,
+      password: await User.hashPassword(userTemplate.password),
+    })
+
     const response = await request(app)
       .patch('/signin')
       .send({
         ...userTemplate,
         email: `a${userTemplate.email}`,
       })
+
+    expect(response.status).toBe(401)
+    expect(response.body.refreshToken).not.toBeDefined()
+    expect(response.body.accessToken).not.toBeDefined()
+  })
+
+  test('unverified email: fails', async () => {
+    await User.create({
+      ...userTemplate,
+      password: await User.hashPassword(userTemplate.password),
+      verifyEmailToken: { exp: 42, jti: 42 },
+    })
+
+    const response = await request(app)
+      .patch('/signin')
+      .send(userTemplate)
 
     expect(response.status).toBe(401)
     expect(response.body.refreshToken).not.toBeDefined()
