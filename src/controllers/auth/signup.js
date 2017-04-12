@@ -2,6 +2,7 @@ const uuid = require('uuid')
 const config = require('../../config')
 const User = require('../../models/user')
 const jwt = require('../../services/jwt')
+const mail = require('../../services/mail')
 
 const emailValidator = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i
 const passwordValidator = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/
@@ -17,34 +18,42 @@ module.exports = (req, res, next) => {
   if (!password)                         return res.status(422).send({ error: 'No password provided' })
   if (!passwordValidator.test(password)) return res.status(422).send({ error: 'Insecure password' })
 
-  const tokenTemplates = {
-    refresh: {
-      aud: 'refresh',
-      exp: jwt.expiry(config.jwt.refreshExpiry),
-      jti: uuid.v4(),
-    },
-    access: {
-      aud: 'access',
-      exp: jwt.expiry(config.jwt.accessExpiry),
-    },
+  const tokenTemplate = {
+    aud: 'verify email',
+    exp: jwt.expiry(config.jwt.verifyEmailExpiry),
+    jti: uuid.v4(),
   }
 
   User.hashPassword(req.body.password)
     .then(hashedPassword => {
-      return User.create({
-        email,
-        password: hashedPassword,
-        refreshTokens: [{ exp: tokenTemplates.refresh.exp, jti: tokenTemplates.refresh.jti }],
-      })
+      return User.findOneAndUpdate(
+        {
+          email,
+          verifyEmailToken: { $exists: true },
+        },
+        {
+          $set: {
+            email,
+            password: hashedPassword,
+            verifyEmailToken: { exp: tokenTemplate.exp, jti: tokenTemplate.jti },
+          },
+        },
+        {
+          new: true,
+          upsert: true,
+        }
+      ).exec()
     })
-    .then(user => res.json({
-      refreshToken: jwt.createToken({ sub: user.id, ...tokenTemplates.refresh }),
-      accessToken: jwt.createToken({ sub: user.id, ...tokenTemplates.access }),
-    }))
+    .then(user => {
+      const token = jwt.createToken({ sub: user.id, ...tokenTemplate })
+      return mail.sendEmailVerificationLink(email, token)
+    })
+    .then(() => res.sendStatus(201))
     .catch(error => {
       if (error.code === 11000) {
         res.status(422).send({ error: 'Email already in use' })
       } else {
+        console.log(error)
         next(error)
       }
     })
