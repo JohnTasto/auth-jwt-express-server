@@ -4,6 +4,7 @@ const User = require('../../models/user')
 const jwt = require('../../services/jwt')
 const mail = require('../../services/mail')
 const AuthenticationError = require('../../services/error').AuthenticationError
+const ValidationError = require('../../services/error').ValidationError
 const validators = require('../../services/validators')
 
 
@@ -86,5 +87,65 @@ module.exports.reset = (req, res, next) => {
     .catch(error => {
       console.log(error)
       next(error)
+    })
+}
+
+module.exports.change = (req, res, next) => {
+  const { body: { email, password, newPassword } } = req
+
+  const tokenTemplates = {
+    refresh: {
+      aud: 'refresh',
+      exp: jwt.expiry(config.jwt.refreshExpiry),
+      jti: uuid.v4(),
+    },
+    access: {
+      aud: 'access',
+      exp: jwt.expiry(config.jwt.accessExpiry),
+    },
+  }
+
+  Promise.resolve()
+    .then(() => {
+      if (!email) throw new ValidationError('No email provided')
+      return User.findOne({ email: email }).exec()
+    })
+    .then(user => {
+      if (!user) throw new AuthenticationError('User not found')
+      if (user.verifyEmailToken) throw new AuthenticationError('Email is not verified')
+      return user.comparePassword(password)
+    })
+    .then(isMatch => {
+      if (isMatch) {
+        return User.hashPassword(newPassword)
+      } else {
+        throw new AuthenticationError('Password does not match')
+      }
+    })
+    .then(hashedPassword =>
+      User.findOneAndUpdate(
+        { email: email },
+        { $set: {
+          password: hashedPassword,
+          refreshTokens: [{
+            exp: tokenTemplates.refresh.exp,
+            jti: tokenTemplates.refresh.jti,
+          }],
+        } },
+      ).exec()
+    )
+    .then(user => res.json({
+      refreshToken: jwt.createToken({ sub: user.id, ...tokenTemplates.refresh }),
+      accessToken: jwt.createToken({ sub: user.id, ...tokenTemplates.access }),
+    }))
+    .catch(error => {
+      if (error instanceof ValidationError) {
+        res.status(422).send({ error: error.message })
+      } if (error instanceof AuthenticationError) {
+        res.status(401).send({ error: error.message })
+      } else {
+        console.log(error)
+        next(error)
+      }
     })
 }

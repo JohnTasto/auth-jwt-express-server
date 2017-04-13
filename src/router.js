@@ -17,12 +17,13 @@ const requireAccessToken = passport.authenticate('access token', { session: fals
 const requireResetPasswordToken = passport.authenticate('reset password token', { session: false })
 
 module.exports = app => {
-  app.post  ('/signup'        ,                             signup)
-  app.patch ('/signin'        ,                             signin)
-  app.patch ('/signout'       , requireRefreshToken       , signout)
-  app.patch ('/verifyemail'   , requireVerifyEmailToken   , verify.email)
-  app.get   ('/refresh'       , requireRefreshToken       , refresh)
-  app.get   ('/resetpassword' ,                             password.sendResetToken)
-  app.patch ('/resetpassword' , requireResetPasswordToken , password.reset)
-  app.get   ('/feature'       , requireAccessToken        , Feature.feature)
+  app.post  ('/signup'         ,                             signup)
+  app.patch ('/signin'         ,                             signin)
+  app.patch ('/signout'        , requireRefreshToken       , signout)
+  app.patch ('/verifyemail'    , requireVerifyEmailToken   , verify.email)
+  app.get   ('/refresh'        , requireRefreshToken       , refresh)
+  app.patch ('/changepassword' ,                             password.change)
+  app.get   ('/resetpassword'  ,                             password.sendResetToken)
+  app.patch ('/resetpassword'  , requireResetPasswordToken , password.reset)
+  app.get   ('/feature'        , requireAccessToken        , Feature.feature)
 }

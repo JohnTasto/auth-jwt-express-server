@@ -143,4 +143,84 @@ describe('Controller: auth password', () => {
       expect(user.refreshTokens).toHaveLength(1)
     })
   })
+
+
+  describe('PATCH /changepassword: change password', () => {
+
+    test('verified email and password: resets password and returns new refresh and access tokens', async () => {
+      const newPassword = 'Password2'
+      await User.create({
+        ...userTemplate,
+        password: await User.hashPassword(userTemplate.password),
+        refreshTokens: [
+          { exp: 42, jti: 42 },
+          { exp: 1337, jti: 1337 },
+        ],
+      })
+
+      const response = await request(app)
+        .patch('/changepassword')
+        .send({ ...userTemplate, newPassword })
+      const user = await User.findOne({ email: userTemplate.email })
+      const isMatch = await user.comparePassword(newPassword)
+
+      expect(response.status).toBe(200)
+      expect(response.body.refreshToken).toBeDefined()
+      expect(response.body.accessToken).toBeDefined()
+      expect(isMatch).toBeTruthy()
+      expect(user.refreshTokens).toHaveLength(1)
+    })
+
+    test('verified email & bad password: fails', async () => {
+      const newPassword = 'Password2'
+      await User.create(userTemplate)
+
+      const response = await request(app)
+        .patch('/changepassword')
+        .send({ ...userTemplate, newPassword })
+      const user = await User.findOne({ email: userTemplate.email })
+      const isMatch = await user.comparePassword(newPassword)
+
+      expect(response.status).toBe(401)
+      expect(response.body.refreshToken).not.toBeDefined()
+      expect(response.body.accessToken).not.toBeDefined()
+      expect(isMatch).toBeFalsy()
+      expect(user.refreshTokens).toHaveLength(0)
+    })
+
+    test('unregistered email: fails', async () => {
+      const newPassword = 'Password2'
+
+      const response = await request(app)
+        .patch('/changepassword')
+        .send({ ...userTemplate, newPassword })
+      const user = await User.findOne({ email: userTemplate.email })
+
+      expect(response.status).toBe(401)
+      expect(response.body.refreshToken).not.toBeDefined()
+      expect(response.body.accessToken).not.toBeDefined()
+      expect(user).toBe(null)
+    })
+
+    test('unverified email and password: fails', async () => {
+      const newPassword = 'Password2'
+      await User.create({
+        ...userTemplate,
+        password: await User.hashPassword(userTemplate.password),
+        verifyEmailToken: { exp: 42, jti: 42 },
+      })
+
+      const response = await request(app)
+        .patch('/changepassword')
+        .send({ ...userTemplate, newPassword })
+      const user = await User.findOne({ email: userTemplate.email })
+      const isMatch = await user.comparePassword(newPassword)
+
+      expect(response.status).toBe(401)
+      expect(response.body.refreshToken).not.toBeDefined()
+      expect(response.body.accessToken).not.toBeDefined()
+      expect(isMatch).toBeFalsy()
+      expect(user.refreshTokens).toHaveLength(0)
+    })
+  })
 })
