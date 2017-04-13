@@ -52,8 +52,6 @@ module.exports.sendResetToken = (req, res, next) => {
 
 module.exports.reset = (req, res, next) => {
   const { payload: { sub, jti }, body: { password } } = req
-  // const payload = req.payload
-  // const password = req.body.password
 
   if (!password)                           return res.status(422).send({ error: 'No password provided' })
   if (!validators.password.test(password)) return res.status(422).send({ error: 'Insecure password' })
@@ -89,6 +87,7 @@ module.exports.reset = (req, res, next) => {
       next(error)
     })
 }
+
 
 module.exports.change = (req, res, next) => {
   const { body: { email, password, newPassword } } = req

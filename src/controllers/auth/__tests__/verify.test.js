@@ -9,7 +9,6 @@ const app = require('../../../app')
 
 const User = mongoose.model('user')
 
-// TODO: test failure cases
 
 describe('Controller: auth verify', () => {
 

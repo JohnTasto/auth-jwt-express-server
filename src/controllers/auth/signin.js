@@ -53,6 +53,7 @@ module.exports = (req, res, next) => {
       } if (error instanceof AuthenticationError) {
         res.status(401).send({ error: error.message })
       } else {
+        console.log(error)
         next(error)
       }
     })

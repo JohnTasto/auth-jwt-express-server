@@ -51,10 +51,12 @@ describe('Controller: auth signin: PATCH /signin: sign in user', () => {
     const response = await request(app)
       .patch('/signin')
       .send(userTemplate)
+    const user = await User.findOne({ email: userTemplate.email })
 
     expect(response.status).toBe(401)
     expect(response.body.refreshToken).not.toBeDefined()
     expect(response.body.accessToken).not.toBeDefined()
+    expect(user).toBe(null)
   })
 
   test('unverified email: fails', async () => {

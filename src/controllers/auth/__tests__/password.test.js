@@ -65,8 +65,6 @@ describe('Controller: auth password', () => {
 
   describe('PATCH /resetpassword: reset password', () => {
 
-    // TODO: test failure cases
-
     const tokenTemplate = {
       aud: 'reset password',
       exp: jwt.expiry(config.jwt.resetPasswordExpiry),
@@ -86,7 +84,6 @@ describe('Controller: auth password', () => {
         .patch('/resetpassword')
         .set('authorization', `Bearer ${token}`)
         .send({ password: newPassword })
-
       const user = await User.findOne({ email: userTemplate.email })
       const isMatch = await user.comparePassword(newPassword)
 
@@ -109,7 +106,6 @@ describe('Controller: auth password', () => {
         .patch('/resetpassword')
         .set('authorization', `Bearer ${token}`)
         .send({ password: newPassword })
-
       const user = await User.findOne({ email: userTemplate.email })
       const isMatch = await user.comparePassword(newPassword)
 
@@ -133,7 +129,6 @@ describe('Controller: auth password', () => {
         .patch('/resetpassword')
         .set('authorization', `Bearer ${token}`)
         .send({ password: newPassword })
-
       const user = await User.findOne({ email: userTemplate.email })
       const isMatch = await user.comparePassword(newPassword)
 
