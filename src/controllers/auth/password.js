@@ -4,6 +4,7 @@ const User = require('../../models/user')
 const jwt = require('../../services/jwt')
 const mail = require('../../services/mail')
 const AuthenticationError = require('../../services/error').AuthenticationError
+const validators = require('../../services/validators')
 
 
 module.exports.sendResetToken = (req, res, next) => {
@@ -52,7 +53,8 @@ module.exports.reset = (req, res, next) => {
   const payload = req.payload
   const password = req.body.password
 
-  // TODO: validate password
+  if (!password)                           return res.status(422).send({ error: 'No password provided' })
+  if (!validators.password.test(password)) return res.status(422).send({ error: 'Insecure password' })
 
   User.hashPassword(password)
     .then(hashedPassword =>
