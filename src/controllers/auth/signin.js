@@ -6,8 +6,7 @@ const AuthenticationError = require('../../services/error').AuthenticationError
 const ValidationError = require('../../services/error').ValidationError
 
 module.exports = (req, res, next) => {
-  const email = req.body.email
-  const password = req.body.password
+  const { body: { email, password } } = req
 
   const tokenTemplates = {
     refresh: {

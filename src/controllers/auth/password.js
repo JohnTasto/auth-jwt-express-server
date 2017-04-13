@@ -8,7 +8,7 @@ const validators = require('../../services/validators')
 
 
 module.exports.sendResetToken = (req, res, next) => {
-  const email = req.body.email
+  const { body: { email } } = req
 
   const tokenTemplate = {
     aud: 'reset password',
@@ -50,8 +50,9 @@ module.exports.sendResetToken = (req, res, next) => {
 
 
 module.exports.reset = (req, res, next) => {
-  const payload = req.payload
-  const password = req.body.password
+  const { payload: { sub, jti }, body: { password } } = req
+  // const payload = req.payload
+  // const password = req.body.password
 
   if (!password)                           return res.status(422).send({ error: 'No password provided' })
   if (!validators.password.test(password)) return res.status(422).send({ error: 'Insecure password' })
@@ -60,8 +61,8 @@ module.exports.reset = (req, res, next) => {
     .then(hashedPassword =>
       User.findOneAndUpdate(
         {
-          _id: payload.sub,
-          'resetPasswordToken.jti': payload.jti,
+          _id: sub,
+          'resetPasswordToken.jti': jti,
           verifyEmailToken: { $exists: false },
         },
         {

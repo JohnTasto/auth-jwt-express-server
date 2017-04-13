@@ -5,7 +5,7 @@ const jwt = require('../../services/jwt')
 
 
 module.exports.email = (req, res, next) => {
-  const payload = req.payload
+  const { payload: { sub, jti } } = req
 
   const tokenTemplates = {
     refresh: {
@@ -23,8 +23,8 @@ module.exports.email = (req, res, next) => {
     .then(() =>
       User.findOneAndUpdate(
         {
-          _id: payload.sub,
-          'verifyEmailToken.jti': payload.jti,
+          _id: sub,
+          'verifyEmailToken.jti': jti,
         },
         {
           $unset: {

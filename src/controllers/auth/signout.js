@@ -3,18 +3,19 @@ const User = require('../../models/user')
 
 
 module.exports = (req, res, next) => {
-  const payload = req.payload
+  const { payload: { sub, jti } } = req
   const now = moment().unix()
+
   Promise.resolve()
     .then(() =>
       User.findOneAndUpdate(
         {
-          _id: payload.sub,
-          refreshTokens: { $elemMatch: { jti: payload.jti } },
+          _id: sub,
+          refreshTokens: { $elemMatch: { jti: jti } },
           verifyEmailToken: { $exists: false },
         },
         { $pull: { refreshTokens: { $or: [
-          { jti: payload.jti },
+          { jti: jti },
           { exp: { $lt: now } },  // do a little maintenance
         ] } } }
       ).exec()

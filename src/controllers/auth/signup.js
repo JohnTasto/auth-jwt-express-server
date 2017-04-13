@@ -7,8 +7,7 @@ const validators = require('../../services/validators')
 
 
 module.exports = (req, res, next) => {
-  const email = req.body.email
-  const password = req.body.password
+  const { body: { email, password } } = req
 
   if (!email)                              return res.status(422).send({ error: 'No email provided' })
   if (!validators.email.test(email))       return res.status(422).send({ error: 'Malformed email' })

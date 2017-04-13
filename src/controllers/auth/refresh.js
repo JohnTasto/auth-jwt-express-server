@@ -5,14 +5,15 @@ const jwt = require('../../services/jwt')
 
 
 module.exports = (req, res, next) => {
-  const payload = req.payload
+  const { payload: { sub, jti } } = req
   const now = moment().unix()
+
   Promise.resolve()
     .then(() =>
       User.findOneAndUpdate(
         {
-          _id: payload.sub,
-          refreshTokens: { $elemMatch: { jti: payload.jti } },
+          _id: sub,
+          refreshTokens: { $elemMatch: { jti: jti } },
           verifyEmailToken: { $exists: false },
         },
         { $pull: { refreshTokens:
