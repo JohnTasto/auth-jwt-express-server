@@ -10,6 +10,8 @@ const sendMail = message =>
     })
   })
 
+const encode = token => token.replace(/\./g, '~')
+
 module.exports.sendEmailVerificationLink = (email, token) => {
   const expiry = `${config.jwt.verifyEmailExpiry[0]} ${config.jwt.verifyEmailExpiry[1]}`
   const message = {
@@ -17,7 +19,7 @@ module.exports.sendEmailVerificationLink = (email, token) => {
     to: email,
     subject: 'Verify your email',
     text: 'Follow this link to verify your email and activate your account:\n\n' +
-          `${config.mail.linkRootURL}/verifyemail/${token}\n\n` +
+          `${config.mail.linkRootURL}/verifyemail/${encode(token)}\n\n` +
           'If you did not request this you can safely ignore it.\n' +
           `This link will expire in ${expiry}.`,
   }
@@ -31,7 +33,7 @@ module.exports.sendResetPasswordLink = (email, token) => {
     to: email,
     subject: 'Reset your password',
     text: 'Follow this link to reset your password:\n\n' +
-          `${config.mail.linkRootURL}/resetpassword/${token}\n\n` +
+          `${config.mail.linkRootURL}/resetpassword/${encode(token)}\n\n` +
           'If you did not request this you can safely ignore it.\n' +
           `This link will expire in ${expiry}.`,
   }
