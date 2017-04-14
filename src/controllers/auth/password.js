@@ -41,7 +41,7 @@ module.exports.sendResetToken = (req, res, next) => {
     .then(() => res.sendStatus(200))
     .catch(error => {
       if (error instanceof AuthenticationError) {
-        res.status(401).send({ error: error.message })
+        res.status(401).send(error.message)
       } else {
         console.log(error)
         next(error)
@@ -79,7 +79,7 @@ module.exports.reset = (req, res, next) => {
       if (user) {
         res.sendStatus(200)
       } else {
-        res.status(401).send({ error: 'Invalid token' })
+        res.status(401).send('Invalid token')
       }
     })
     .catch(error => {
@@ -139,9 +139,9 @@ module.exports.change = (req, res, next) => {
     }))
     .catch(error => {
       if (error instanceof ValidationError) {
-        res.status(422).send({ error: error.message })
+        res.status(422).send(error.message)
       } if (error instanceof AuthenticationError) {
-        res.status(401).send({ error: error.message })
+        res.status(401).send(error.message)
       } else {
         console.log(error)
         next(error)

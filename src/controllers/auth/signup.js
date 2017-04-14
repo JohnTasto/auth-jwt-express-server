@@ -9,10 +9,10 @@ const validators = require('../../services/validators')
 module.exports = (req, res, next) => {
   const { body: { email, password } } = req
 
-  if (!email)                              return res.status(422).send({ error: 'No email provided' })
-  if (!validators.email.test(email))       return res.status(422).send({ error: 'Malformed email' })
-  if (!password)                           return res.status(422).send({ error: 'No password provided' })
-  if (!validators.password.test(password)) return res.status(422).send({ error: 'Insecure password' })
+  if (!email)                              return res.status(422).send('No email provided')
+  if (!validators.email.test(email))       return res.status(422).send('Malformed email')
+  if (!password)                           return res.status(422).send('No password provided')
+  if (!validators.password.test(password)) return res.status(422).send('Insecure password')
 
   const tokenTemplate = {
     aud: 'verify email',
@@ -47,7 +47,7 @@ module.exports = (req, res, next) => {
     .then(() => res.sendStatus(201))
     .catch(error => {
       if (error.code === 11000) {
-        res.status(422).send({ error: 'Email already in use' })
+        res.status(422).send('Email already in use')
       } else {
         console.log(error)
         next(error)

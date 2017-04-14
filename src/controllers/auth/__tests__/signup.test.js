@@ -61,6 +61,5 @@ describe('Controller: auth signup: POST /signup: create new user', () => {
 
     expect(userCount).toBe(1)
     expect(response.status).toBe(422)
-    expect(typeof response.body.error).toBe('string')
   })
 })

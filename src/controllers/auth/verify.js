@@ -46,7 +46,7 @@ module.exports.email = (req, res, next) => {
           accessToken: jwt.createToken({ sub: user.id, ...tokenTemplates.access }),
         })
       } else {
-        res.status(401).send({ error: 'Invalid token' })
+        res.status(401).send('Invalid token')
       }
     })
     .catch(error => {

@@ -24,7 +24,7 @@ module.exports = (req, res, next) => {
       if (user) {
         res.sendStatus(200)
       } else {
-        res.status(401).send({ error: 'Invalid token' })
+        res.status(401).send('Invalid token')
       }
     })
     .catch(error => {

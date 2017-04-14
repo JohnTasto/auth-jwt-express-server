@@ -49,9 +49,9 @@ module.exports = (req, res, next) => {
     }))
     .catch(error => {
       if (error instanceof ValidationError) {
-        res.status(422).send({ error: error.message })
+        res.status(422).send(error.message)
       } if (error instanceof AuthenticationError) {
-        res.status(401).send({ error: error.message })
+        res.status(401).send(error.message)
       } else {
         console.log(error)
         next(error)
