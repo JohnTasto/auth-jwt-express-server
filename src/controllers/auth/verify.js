@@ -44,6 +44,7 @@ module.exports.email = (req, res, next) => {
         res.json({
           refreshToken: jwt.createToken({ sub: user.id, ...tokenTemplates.refresh }),
           accessToken: jwt.createToken({ sub: user.id, ...tokenTemplates.access }),
+          time: jwt.now(),
         })
       } else {
         res.status(401).send('Invalid token')

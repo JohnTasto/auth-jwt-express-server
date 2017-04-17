@@ -136,6 +136,7 @@ module.exports.change = (req, res, next) => {
     .then(user => res.json({
       refreshToken: jwt.createToken({ sub: user.id, ...tokenTemplates.refresh }),
       accessToken: jwt.createToken({ sub: user.id, ...tokenTemplates.access }),
+      time: jwt.now(),
     }))
     .catch(error => {
       if (error instanceof ValidationError) {

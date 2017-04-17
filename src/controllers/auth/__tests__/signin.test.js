@@ -32,6 +32,7 @@ describe('Controller: auth signin: PATCH /signin: sign in user', () => {
     expect(response.status).toBe(200)
     expect(response.body.refreshToken).toBeDefined()
     expect(response.body.accessToken).toBeDefined()
+    expect(response.body.time).toBeDefined()
     expect(user.refreshTokens).toHaveLength(1)
   })
 
@@ -45,6 +46,7 @@ describe('Controller: auth signin: PATCH /signin: sign in user', () => {
     expect(response.status).toBe(401)
     expect(response.body.refreshToken).not.toBeDefined()
     expect(response.body.accessToken).not.toBeDefined()
+    expect(response.body.time).not.toBeDefined()
   })
 
   test('unregistered email: fails', async () => {
@@ -56,6 +58,7 @@ describe('Controller: auth signin: PATCH /signin: sign in user', () => {
     expect(response.status).toBe(401)
     expect(response.body.refreshToken).not.toBeDefined()
     expect(response.body.accessToken).not.toBeDefined()
+    expect(response.body.time).not.toBeDefined()
     expect(user).toBe(null)
   })
 
@@ -73,5 +76,6 @@ describe('Controller: auth signin: PATCH /signin: sign in user', () => {
     expect(response.status).toBe(401)
     expect(response.body.refreshToken).not.toBeDefined()
     expect(response.body.accessToken).not.toBeDefined()
+    expect(response.body.time).not.toBeDefined()
   })
 })

@@ -40,6 +40,7 @@ describe('Controller: auth refresh: POST /refresh: get access token', () => {
 
     expect(response.status).toBe(200)
     expect(response.body.accessToken).toBeDefined()
+    expect(response.body.time).toBeDefined()
   })
 
   test('valid refresh token: removes expired tokens from DB', async () => {
@@ -75,6 +76,7 @@ describe('Controller: auth refresh: POST /refresh: get access token', () => {
 
     expect(response.status).toBe(401)
     expect(response.body.accessToken).not.toBeDefined()
+    expect(response.body.time).not.toBeDefined()
   })
 
   test('unverified email: fails', async () => {
@@ -91,5 +93,6 @@ describe('Controller: auth refresh: POST /refresh: get access token', () => {
 
     expect(response.status).toBe(401)
     expect(response.body.accessToken).not.toBeDefined()
+    expect(response.body.time).not.toBeDefined()
   })
 })

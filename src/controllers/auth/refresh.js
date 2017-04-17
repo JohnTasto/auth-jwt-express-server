@@ -1,4 +1,3 @@
-const moment = require('moment')
 const config = require('../../config')
 const User = require('../../models/user')
 const jwt = require('../../services/jwt')
@@ -6,7 +5,7 @@ const jwt = require('../../services/jwt')
 
 module.exports = (req, res, next) => {
   const { payload: { sub, jti } } = req
-  const now = moment().unix()
+  const now = jwt.now()
 
   Promise.resolve()
     .then(() =>
@@ -29,6 +28,7 @@ module.exports = (req, res, next) => {
             sub: user.id,
             exp: jwt.expiry(config.jwt.accessExpiry),
           }),
+          time: now,
         })
       } else {
         res.status(401).send('Invalid token')
